@@ -1,25 +1,28 @@
 <?php
-$data = json_decode(file_get_contents("php://input"), true);
+header('Content-Type: application/json');
 
-$db = new SQLite3("game.db");
+// Capture raw payload from Fetch API
+$jsonPayload = file_get_contents('php://input');
+$data = json_decode($jsonPayload, true);
 
-// create table if not exists
-$db->exec("CREATE TABLE IF NOT EXISTS player (
-    id INTEGER PRIMARY KEY,
-    health INTEGER,
-    speed INTEGER,
-    jump INTEGER
-)");
+if (!$data ||!isset($data['playerId'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid data payload']);
+    exit;
+}
 
-// clear old data
-$db->exec("DELETE FROM player");
+// Sanitize player ID to prevent Path Traversal vulnerabilities
+$safePlayerId = preg_replace("/[^a-zA-Z0-9]+/", "", $data['playerId']);
+$filename = 'saves/player_'. $safePlayerId. '.json';
 
-// insert new data
-$stmt = $db->prepare("INSERT INTO player (health, speed, jump) VALUES (?, ?, ?)");
-$stmt->bindValue(1, $data["health"]);
-$stmt->bindValue(2, $data["speed"]);
-$stmt->bindValue(3, $data["jump"]);
-$stmt->execute();
+// Ensure the directory exists
+if (!file_exists('saves')) {
+    mkdir('saves', 0777, true);
+}
 
-echo "Saved!";
+// Save securely using an exclusive lock
+if (file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX)) {
+    echo json_encode(['status' => 'success']);
+} else {
+    echo json_encode(['status' => 'error']);
+}
 ?>
