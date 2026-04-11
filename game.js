@@ -14,7 +14,7 @@ let timeSinceLastCandy = 0;
 // PLAYER
 // ------------------
 let player = {
-    x: 50, y: 300,
+    x: 50, y: 350,
     width: 20, height: 20,
     vx: 0, vy: 0,
     speed: 150,
@@ -27,12 +27,39 @@ let player = {
 let gravity = 800;
 
 // ------------------
-// LEVEL (VISIBLE PLATFORM)
+// LEVEL (VERTICAL PLATFORMS)
 // ------------------
 let obstacles = [
-    { x: 0, y: 380, width: 800, height: 20 }, // ground
-    { x: 300, y: 300, width: 120, height: 20 } // platform
+    { x: 0, y: 380, width: 800, height: 20 },   // ground
+    { x: 100, y: 320, width: 120, height: 20 },
+    { x: 300, y: 260, width: 120, height: 20 },
+
+    // 🔥 MOVING PLATFORM (FIXED UNREACHABLE PLATFORM)
+    { 
+        x: 150, 
+        y: 200, 
+        width: 120, 
+        height: 20,
+        moving: true,
+        minX: 100,
+        maxX: 500,
+        direction: 1,
+        speed: 120
+    },
+
+    { x: 400, y: 140, width: 120, height: 20 },
+    { x: 250, y: 80,  width: 120, height: 20 }
 ];
+
+// ------------------
+// GOAL (DIAMOND SHAPE)
+// ------------------
+let star = {
+    x: 280,
+    y: 40,
+    width: 20,
+    height: 20
+};
 
 // ------------------
 // INPUT
@@ -70,7 +97,7 @@ function gameLoop(currentTime) {
 // ------------------
 function updatePhysics(deltaTime) {
 
-    // FIXED movement logic
+    // movement
     if (keys['ArrowRight']) player.vx = player.speed;
     else if (keys['ArrowLeft']) player.vx = -player.speed;
     else player.vx = 0;
@@ -83,7 +110,28 @@ function updatePhysics(deltaTime) {
 
     player.grounded = false;
 
-    // collision
+    // ------------------
+    // MOVE PLATFORMS
+    // ------------------
+    for (let obs of obstacles) {
+        if (obs.moving) {
+            obs.x += obs.direction * obs.speed * deltaTime;
+
+            // bounce at bounds
+            if (obs.x <= obs.minX) {
+                obs.x = obs.minX;
+                obs.direction = 1;
+            } 
+            else if (obs.x + obs.width >= obs.maxX) {
+                obs.x = obs.maxX - obs.width;
+                obs.direction = -1;
+            }
+        }
+    }
+
+    // ------------------
+    // COLLISION
+    // ------------------
     for (let obs of obstacles) {
         if (
             player.x < obs.x + obs.width &&
@@ -95,6 +143,11 @@ function updatePhysics(deltaTime) {
             player.y = obs.y - player.height;
             player.vy = 0;
             player.grounded = true;
+
+            // 🔥 PLAYER MOVES WITH PLATFORM (important polish)
+            if (obs.moving) {
+                player.x += obs.direction * obs.speed * deltaTime;
+            }
         }
     }
 
@@ -103,15 +156,29 @@ function updatePhysics(deltaTime) {
         player.vy = -player.jumpHeight;
     }
 
-    // level complete trigger
-    if (player.x > canvas.width) {
+    // ------------------
+    // GOAL COLLISION (WIN)
+    // ------------------
+    if (
+        player.x < star.x + star.width &&
+        player.x + player.width > star.x &&
+        player.y < star.y + star.height &&
+        player.y + player.height > star.y
+    ) {
         gameState = 'MENU';
         document.getElementById('levelStatus').style.display = 'block';
+    }
+
+    // prevent falling forever
+    if (player.y > canvas.height + 100) {
+        player.x = 50;
+        player.y = 350;
+        player.vy = 0;
     }
 }
 
 // ------------------
-// DRAW (NOW REAL GRAPHICS)
+// DRAW
 // ------------------
 function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -122,7 +189,19 @@ function drawCanvas() {
         ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
     }
 
-    // player (animated color change)
+    // ------------------
+    // DRAW GOAL (DIAMOND)
+    // ------------------
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.moveTo(star.x + star.width / 2, star.y);
+    ctx.lineTo(star.x + star.width, star.y + star.height / 2);
+    ctx.lineTo(star.x + star.width / 2, star.y + star.height);
+    ctx.lineTo(star.x, star.y + star.height / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // player
     ctx.fillStyle = player.grounded ? '#39ff14' : '#00ffff';
     ctx.fillRect(player.x, player.y, player.width, player.height);
 }
@@ -164,9 +243,8 @@ function applyUpgrade(type) {
         if (type === 'jump') player.jumpHeight += 50;
         if (type === 'speed') player.speed += 50;
 
-        // reset level
         player.x = 50;
-        player.y = 300;
+        player.y = 350;
 
         document.getElementById('levelStatus').style.display = 'none';
         storyText.innerText = "";
