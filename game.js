@@ -11,6 +11,11 @@ let candies = 0;
 let timeSinceLastCandy = 0;
 
 // ------------------
+// CAMERA (ADDED)
+// ------------------
+let cameraY = 0;
+
+// ------------------
 // LEVEL SYSTEM
 // ------------------
 let nextLevel = 1;
@@ -42,15 +47,13 @@ let star = { x: 0, y: 0, width: 20, height: 20 };
 // ------------------
 function loadLevel(level) {
 
-    // reset player (keep upgrades)
     player.x = 50;
     player.y = 350;
     player.vx = 0;
     player.vy = 0;
 
-    // ------------------
-    // LEVEL 1 (UNCHANGED)
-    // ------------------
+    cameraY = 0; // reset camera
+
     if (level === 1) {
         obstacles = [
             { x: 0, y: 380, width: 800, height: 20 },
@@ -64,14 +67,10 @@ function loadLevel(level) {
         star = { x: 280, y: 40, width: 20, height: 20 };
     }
 
-    // ------------------
-    // LEVEL 2 (FIXED)
-    // ------------------
     if (level === 2) {
         obstacles = [
             { x: 0, y: 380, width: 800, height: 20 },
 
-            // reachable spacing (no impossible jumps)
             { x: 100, y: 330, width: 120, height: 20 },
             { x: 250, y: 300, width: 120, height: 20 },
             { x: 120, y: 270, width: 120, height: 20 },
@@ -82,7 +81,6 @@ function loadLevel(level) {
             { x: 140, y: 150, width: 120, height: 20 },
             { x: 280, y: 120, width: 120, height: 20 },
 
-            // last 2 moving only
             { x: 160, y: 90, width: 120, height: 20, moving: true, minX: 100, maxX: 500, direction: 1, speed: 90 },
             { x: 320, y: 60, width: 120, height: 20, moving: true, minX: 150, maxX: 550, direction: -1, speed: 100 }
         ];
@@ -102,14 +100,13 @@ window.addEventListener('keydown', e => keys[e.code] = true);
 window.addEventListener('keyup', e => keys[e.code] = false);
 
 // ------------------
-// LOOP
+// LOOP (MINIMAL CHANGE)
 // ------------------
 function gameLoop(currentTime) {
     let deltaTime = (currentTime - lastTime) / 1000;
     if (deltaTime > 0.1) deltaTime = 0.1;
     lastTime = currentTime;
 
-    // candy generation
     timeSinceLastCandy += deltaTime;
     if (timeSinceLastCandy >= 1.0) {
         candies++;
@@ -119,31 +116,38 @@ function gameLoop(currentTime) {
 
     if (gameState === 'PLAYING') {
         updatePhysics(deltaTime);
-        drawCanvas();
     }
+
+    updateCamera();   // added
+    drawCanvas();     // always draw
 
     requestAnimationFrame(gameLoop);
 }
 
 // ------------------
-// PHYSICS
+// CAMERA FOLLOW (NEW)
+// ------------------
+function updateCamera() {
+    let targetY = player.y - canvas.height / 2 + 120;
+    cameraY += (targetY - cameraY) * 0.1;
+}
+
+// ------------------
+// PHYSICS (UNCHANGED)
 // ------------------
 function updatePhysics(deltaTime) {
 
-    // movement
     if (keys['ArrowRight']) player.vx = player.speed;
     else if (keys['ArrowLeft']) player.vx = -player.speed;
     else player.vx = 0;
 
     player.x += player.vx * deltaTime;
 
-    // gravity
     player.vy += gravity * deltaTime;
     player.y += player.vy * deltaTime;
 
     player.grounded = false;
 
-    // move platforms
     for (let obs of obstacles) {
         if (obs.moving) {
             obs.x += obs.direction * obs.speed * deltaTime;
@@ -159,7 +163,6 @@ function updatePhysics(deltaTime) {
         }
     }
 
-    // collision
     for (let obs of obstacles) {
         if (
             player.x < obs.x + obs.width &&
@@ -178,14 +181,10 @@ function updatePhysics(deltaTime) {
         }
     }
 
-    // jump
     if (keys['Space'] && player.grounded) {
         player.vy = -player.jumpHeight;
     }
 
-    // ------------------
-    // GOAL (FIXED FLOW)
-    // ------------------
     if (
         player.x < star.x + star.width &&
         player.x + player.width > star.x &&
@@ -193,14 +192,11 @@ function updatePhysics(deltaTime) {
         player.y + player.height > star.y
     ) {
         nextLevel = player.level + 1;
-
         gameState = 'MENU';
         document.getElementById('levelStatus').style.display = 'block';
-
-        updateUI(); // ensure buttons appear
+        updateUI();
     }
 
-    // reset if falling
     if (player.y > canvas.height + 100) {
         player.x = 50;
         player.y = 350;
@@ -209,18 +205,19 @@ function updatePhysics(deltaTime) {
 }
 
 // ------------------
-// DRAW
+// DRAW (MODIFIED FOR CAMERA)
 // ------------------
 function drawCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // platforms
+    ctx.save();
+    ctx.translate(0, -cameraY);
+
     ctx.fillStyle = '#888';
     for (let obs of obstacles) {
         ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
     }
 
-    // goal
     ctx.fillStyle = 'yellow';
     ctx.beginPath();
     ctx.moveTo(star.x + star.width / 2, star.y);
@@ -230,13 +227,14 @@ function drawCanvas() {
     ctx.closePath();
     ctx.fill();
 
-    // player
     ctx.fillStyle = player.grounded ? '#39ff14' : '#00ffff';
     ctx.fillRect(player.x, player.y, player.width, player.height);
+
+    ctx.restore();
 }
 
 // ------------------
-// UI
+// UI (UNCHANGED)
 // ------------------
 const resourceDisplay = document.getElementById('resourceDisplay');
 const healthDisplay = document.getElementById('healthDisplay');
@@ -259,7 +257,7 @@ function updateUI() {
 }
 
 // ------------------
-// UPGRADES → LOAD NEXT LEVEL
+// UPGRADES (UNCHANGED)
 // ------------------
 document.getElementById('btnUpgradeHealth').addEventListener('click', () => applyUpgrade('health'));
 document.getElementById('btnUpgradeJump').addEventListener('click', () => applyUpgrade('jump'));
@@ -273,7 +271,6 @@ function applyUpgrade(type) {
         if (type === 'jump') player.jumpHeight += 50;
         if (type === 'speed') player.speed += 50;
 
-        // move to next level
         player.level = nextLevel;
         loadLevel(player.level);
 
@@ -287,21 +284,19 @@ function applyUpgrade(type) {
 }
 
 // ------------------
-// SAVE
+// SAVE (UNCHANGED)
 // ------------------
 function saveGame() {
-    const saveData = {
-        playerId: "student_dev_1",
-        health: player.health,
-        candies: candies,
-        level: player.level,
-        stats: { jumpHeight: player.jumpHeight, speed: player.speed }
-    };
-
     fetch('save.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(saveData)
+        body: JSON.stringify({
+            playerId: "student_dev_1",
+            health: player.health,
+            candies: candies,
+            level: player.level,
+            stats: { jumpHeight: player.jumpHeight, speed: player.speed }
+        })
     });
 }
 
