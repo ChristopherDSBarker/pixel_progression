@@ -11,6 +11,11 @@ let candies = 0;
 let timeSinceLastCandy = 0;
 
 // ------------------
+// LEVEL SYSTEM
+// ------------------
+let nextLevel = 1;
+
+// ------------------
 // PLAYER
 // ------------------
 let player = {
@@ -27,39 +32,67 @@ let player = {
 let gravity = 800;
 
 // ------------------
-// LEVEL (VERTICAL PLATFORMS)
+// LEVEL DATA
 // ------------------
-let obstacles = [
-    { x: 0, y: 380, width: 800, height: 20 },   // ground
-    { x: 100, y: 320, width: 120, height: 20 },
-    { x: 300, y: 260, width: 120, height: 20 },
-
-    // 🔥 MOVING PLATFORM (FIXED UNREACHABLE PLATFORM)
-    { 
-        x: 150, 
-        y: 200, 
-        width: 120, 
-        height: 20,
-        moving: true,
-        minX: 100,
-        maxX: 500,
-        direction: 1,
-        speed: 120
-    },
-
-    { x: 400, y: 140, width: 120, height: 20 },
-    { x: 250, y: 80,  width: 120, height: 20 }
-];
+let obstacles = [];
+let star = { x: 0, y: 0, width: 20, height: 20 };
 
 // ------------------
-// GOAL (DIAMOND SHAPE)
+// LOAD LEVELS
 // ------------------
-let star = {
-    x: 280,
-    y: 40,
-    width: 20,
-    height: 20
-};
+function loadLevel(level) {
+
+    // reset player (keep upgrades)
+    player.x = 50;
+    player.y = 350;
+    player.vx = 0;
+    player.vy = 0;
+
+    // ------------------
+    // LEVEL 1 (UNCHANGED)
+    // ------------------
+    if (level === 1) {
+        obstacles = [
+            { x: 0, y: 380, width: 800, height: 20 },
+            { x: 100, y: 320, width: 120, height: 20 },
+            { x: 300, y: 260, width: 120, height: 20 },
+            { x: 150, y: 200, width: 120, height: 20, moving: true, minX: 100, maxX: 500, direction: 1, speed: 120 },
+            { x: 400, y: 140, width: 120, height: 20 },
+            { x: 250, y: 80,  width: 120, height: 20 }
+        ];
+
+        star = { x: 280, y: 40, width: 20, height: 20 };
+    }
+
+    // ------------------
+    // LEVEL 2 (FIXED)
+    // ------------------
+    if (level === 2) {
+        obstacles = [
+            { x: 0, y: 380, width: 800, height: 20 },
+
+            // reachable spacing (no impossible jumps)
+            { x: 100, y: 330, width: 120, height: 20 },
+            { x: 250, y: 300, width: 120, height: 20 },
+            { x: 120, y: 270, width: 120, height: 20 },
+            { x: 300, y: 240, width: 120, height: 20 },
+
+            { x: 180, y: 210, width: 120, height: 20 },
+            { x: 340, y: 180, width: 120, height: 20 },
+            { x: 140, y: 150, width: 120, height: 20 },
+            { x: 280, y: 120, width: 120, height: 20 },
+
+            // last 2 moving only
+            { x: 160, y: 90, width: 120, height: 20, moving: true, minX: 100, maxX: 500, direction: 1, speed: 90 },
+            { x: 320, y: 60, width: 120, height: 20, moving: true, minX: 150, maxX: 550, direction: -1, speed: 100 }
+        ];
+
+        star = { x: 260, y: 20, width: 20, height: 20 };
+    }
+}
+
+// initial load
+loadLevel(1);
 
 // ------------------
 // INPUT
@@ -76,10 +109,10 @@ function gameLoop(currentTime) {
     if (deltaTime > 0.1) deltaTime = 0.1;
     lastTime = currentTime;
 
-    // passive candy system
+    // candy generation
     timeSinceLastCandy += deltaTime;
     if (timeSinceLastCandy >= 1.0) {
-        candies += 1;
+        candies++;
         timeSinceLastCandy = 0;
         updateUI();
     }
@@ -110,14 +143,11 @@ function updatePhysics(deltaTime) {
 
     player.grounded = false;
 
-    // ------------------
-    // MOVE PLATFORMS
-    // ------------------
+    // move platforms
     for (let obs of obstacles) {
         if (obs.moving) {
             obs.x += obs.direction * obs.speed * deltaTime;
 
-            // bounce at bounds
             if (obs.x <= obs.minX) {
                 obs.x = obs.minX;
                 obs.direction = 1;
@@ -129,9 +159,7 @@ function updatePhysics(deltaTime) {
         }
     }
 
-    // ------------------
-    // COLLISION
-    // ------------------
+    // collision
     for (let obs of obstacles) {
         if (
             player.x < obs.x + obs.width &&
@@ -144,7 +172,6 @@ function updatePhysics(deltaTime) {
             player.vy = 0;
             player.grounded = true;
 
-            // 🔥 PLAYER MOVES WITH PLATFORM (important polish)
             if (obs.moving) {
                 player.x += obs.direction * obs.speed * deltaTime;
             }
@@ -157,7 +184,7 @@ function updatePhysics(deltaTime) {
     }
 
     // ------------------
-    // GOAL COLLISION (WIN)
+    // GOAL (FIXED FLOW)
     // ------------------
     if (
         player.x < star.x + star.width &&
@@ -165,11 +192,15 @@ function updatePhysics(deltaTime) {
         player.y < star.y + star.height &&
         player.y + player.height > star.y
     ) {
+        nextLevel = player.level + 1;
+
         gameState = 'MENU';
         document.getElementById('levelStatus').style.display = 'block';
+
+        updateUI(); // ensure buttons appear
     }
 
-    // prevent falling forever
+    // reset if falling
     if (player.y > canvas.height + 100) {
         player.x = 50;
         player.y = 350;
@@ -189,9 +220,7 @@ function drawCanvas() {
         ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
     }
 
-    // ------------------
-    // DRAW GOAL (DIAMOND)
-    // ------------------
+    // goal
     ctx.fillStyle = 'yellow';
     ctx.beginPath();
     ctx.moveTo(star.x + star.width / 2, star.y);
@@ -220,6 +249,7 @@ function updateUI() {
 
     if (candies >= 10 && gameState === 'MENU') {
         upgradeButtons.style.display = 'block';
+
         if (!storyText.innerText.includes("merchant")) {
             storyText.innerText = "The candy merchant appears and offers you upgrades...";
         }
@@ -229,7 +259,7 @@ function updateUI() {
 }
 
 // ------------------
-// UPGRADES
+// UPGRADES → LOAD NEXT LEVEL
 // ------------------
 document.getElementById('btnUpgradeHealth').addEventListener('click', () => applyUpgrade('health'));
 document.getElementById('btnUpgradeJump').addEventListener('click', () => applyUpgrade('jump'));
@@ -243,8 +273,9 @@ function applyUpgrade(type) {
         if (type === 'jump') player.jumpHeight += 50;
         if (type === 'speed') player.speed += 50;
 
-        player.x = 50;
-        player.y = 350;
+        // move to next level
+        player.level = nextLevel;
+        loadLevel(player.level);
 
         document.getElementById('levelStatus').style.display = 'none';
         storyText.innerText = "";
