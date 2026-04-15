@@ -1,0 +1,31 @@
+h1 {
+    border: 5px black double;
+    padding: 5px;
+    text-align: center;
+    background-color: skyblue;
+    font-family: sans-serif;
+}
+
+table {
+    border: 2px dashed black;
+    padding: 5px;
+    background-color: rgb(255, 255, 135);
+}
+
+span {
+    border-bottom: 2px solid black;
+    padding: 5px;
+}
+
+#welcome {
+    border: 2px solid black;
+    padding: 5px;
+    display: inline-block;
+}
+
+img {
+    border: 5px ridge black;
+    padding: 5px;
+    width: 4%;
+    background-color: mediumseagreen;
+}
