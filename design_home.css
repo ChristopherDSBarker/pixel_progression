@@ -1,0 +1,44 @@
+h1 {
+    position: relative;
+    
+    padding-top: 10px;
+    text-align: center;
+    font-family: monospace;
+    font-size: 40px;
+}
+
+#title1 {
+    color: rgb(255, 255, 135);
+    text-shadow: -2px 0px 0 black;
+}
+
+#title2 {
+    padding-top: 1px;
+    color: skyblue;
+    text-shadow: -2px 0px 0 black;
+}
+
+table {
+    border: 2px dashed black;
+    padding: 5px;
+    background-color: rgb(255, 255, 135);
+}
+
+#welcome {
+    border: 2px solid black;
+    padding: 5px;
+    display: inline-block;
+}
+
+img {
+    border: 5px ridge black;
+    padding: 5px;
+    width: 10%;
+    background-color: mediumseagreen;
+    opacity: 75%;
+
+    position: absolute;
+    top: 4%;
+    left: 43%;
+
+}
