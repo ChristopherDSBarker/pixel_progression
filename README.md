@@ -1,1 +1,1 @@
-# csci367_4
+project/ │ ├── home.php (website's home page) ├── design_home.css (basic styling) 
