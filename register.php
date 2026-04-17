@@ -1,3 +1,4 @@
+<!-- TEST -->
 <html>
 	<head>
 		<title>Register</title>
@@ -8,6 +9,9 @@
 	<body style="background-color: teal">
 
         <h1>: P i x e l . P r o g r e s s i o n :</h1>
+
+        <!-- BORDER WRAPPED AROUND FORM, LOGO, AND MORE -->
+        <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
 
         <?php 
             //RECEIVES SERVER REQUEST FOR USERNAME AND PASSWORD
@@ -34,13 +38,12 @@
                     header("Location: login.php?created=1");
                     exit();
                 } else {
-                    echo "An account with this username already exists. <br><br>";
+                    ?>
+
+                    <?php
                 }
             }
         ?>
-
-        <!-- BORDER WRAPPED AROUND FORM, LOGO, AND MORE -->
-        <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span>Register for an account!</span><br><br>
