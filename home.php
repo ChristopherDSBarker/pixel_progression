@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<title>Home</title>
-        <link rel="stylesheet" href="design_home.css"/>
+        <link rel="stylesheet" href="style_home.css">
         <link rel="icon" type="image/png" href="conceptlogo.png">
 	</head>
 
@@ -22,7 +22,9 @@
             session_start();
                ?>
             <div style="display: flex; justify-content: center; align-items: center;">
-                <span id="welcome">Welcome, <?php echo $_SESSION['username'] ?></span>
+                <span style="font-size: 15px; color: white; font-family: monospace; display: inline-block">
+                    Welcome,  <span style="color: aquamarine"><?php echo $_SESSION['username'] ?></span>
+                </span>
             </div>
         <?php } ?>
 
@@ -46,15 +48,24 @@
         </div>
 
         <script>
-            let button = document.getElementByClassName("button");
+            let playButton = document.getElementsByClassName("button")[0];
+            let logButton = document.getElementsByClassName("button")[1];
             
-            button.addEventListener("mouseover", () => {
-                button.style.backgroundColor = "rgb(255, 255, 135)";
-            })
+            playButton.addEventListener("mouseover", function() {
+                playButton.style.backgroundColor = "rgb(255, 255, 135)";
+            });
 
-            button.addEventListener("mouseout", () => {
-                button.style.backgroundColor = "aquamarine";
-            })
+            playButton.addEventListener("mouseout", function() {
+                playButton.style.backgroundColor = "aquamarine";
+            });
+
+            logButton.addEventListener("mouseover", function() {
+                logButton.style.backgroundColor = "rgb(255, 255, 135)";
+            });
+
+            logButton.addEventListener("mouseout", function() {
+                logButton.style.backgroundColor = "aquamarine";
+            });
             
 
         </script>
