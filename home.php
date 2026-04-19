@@ -1,12 +1,21 @@
 <html>
 	<head>
 		<title>Home</title>
+
         <link rel="stylesheet" href="design.css"/>
+        <link rel="icon" type="image/png" href="conceptlogo.png"/>
 	</head>
 
 	<body>
 
-        <h1>: P i x e l . P r o g r e s s i o n :</h1>
+        <h1>
+            <u style="color: rgb(255, 255, 135); text-shadow: 2px 2px 2px black">
+                <span style="color: rgb(255, 255, 135); border-bottom: none; text-shadow: 2px 2px 2px black">P i x e l</span><br>
+            </u>
+            <u style="color: skyblue; text-shadow: 2px 2px 2px black">
+                <span style="color: skyblue; border-bottom: none; text-shadow: 2px 2px 2px black">P r o g r e s s i o n</span>
+            </u>
+        </h1>
 
         <?php
             //DISPLAYS THIS MESSAGE AFTER LOGGING IN

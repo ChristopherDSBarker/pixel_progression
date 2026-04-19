@@ -1,20 +1,26 @@
+
 h1 {
-    border: 5px black double;
-    padding: 5px;
+    border: 5px black ridge;
+    padding: 15px;
     text-align: center;
-    background-color: skyblue;
+    background-color: aquamarine;
     font-family: sans-serif;
+    box-shadow: 3px 3px 3px black;
+    font-size: 50;
 }
 
 table {
-    border: 2px dashed black;
-    padding: 5px;
+    border: 5px ridge lightgray;
+    padding: 10px;
     background-color: rgb(255, 255, 135);
+    box-shadow: 3px 3px 3px black;
 }
 
 span {
     border-bottom: 2px solid black;
     padding: 5px;
+    font-family: sans-serif;
+    align
 }
 
 #welcome {
@@ -24,8 +30,40 @@ span {
 }
 
 img {
-    border: 5px ridge black;
+    border: 5px ridge white;
     padding: 5px;
-    width: 4%;
+    width: 35px;
     background-color: mediumseagreen;
+    box-shadow: 3px 3px 3px black;
+}
+
+a {
+    color: black;
+    font-size: 20;
+    font-family: sans-serif;
+}
+
+p {
+    font-size: 20;
+    font-family: sans-serif;
+}
+
+button {
+    background-color: antiquewhite;
+    border: 2px ridge white;
+    box-shadow: 2px 2px 2px black;
+}
+
+.content {
+    border: 5px ridge black;
+    box-shadow: 3px 3px 3px black;
+    padding: 5px;
+    background-color: aquamarine;
+}
+
+.logodiv {
+    border: none;
+    box-shadow: none;
+    padding: none;
+    background-color: none;
 }
