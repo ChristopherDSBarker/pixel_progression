@@ -24,7 +24,7 @@
             <div style="display: flex; justify-content: center; align-items: center;">
                 <span style="font-size: 15px; color: white; font-family: monospace; display: inline-block">
                     Welcome,  <span style="color: aquamarine"><?php echo $_SESSION['username'] ?></span>
-                </span>
+                !</span>
             </div>
         <?php } ?>
 
@@ -39,7 +39,6 @@
         <div style="display: flex; justify-content: center; align-items: center">
             <?php
             if (isset($_GET['log'])) {
-                session_start();
                 ?>
                 <a href="home.php" id="signout" class="button">LOG OUT</a>
             <?php } else { ?>
