@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<title>How to Play</title>
+        <link rel="stylesheet" href="style_htp.css?v=1">
+        <link rel="icon" type="image/png" href="conceptlogo.png">
+	</head>
+
+	<body style="background-color: teal">
+        <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
+            <h1 id="title1">P i x e l</h1>
+            <h1 id="title2"> P r o g r e s s i o n </h1>
+        </div>
+
+        <br>
+
+        <div style="background-color: teal; border: 5px black double; padding: 5px">
+            <h2>How to Play</h2>
+
+            <br>
+
+            <p style="font-family: monospace; color: white; font-size: 20px">
+                Welcome to <span id="title1">Pixel</span> <span id="title2">Progression!</span>
+                <br><br>
+                Inspired by games like RobTopGames' Geometry Dash and aniwey's Candy Box, Pixel Progression is a 
+                2D platformer focused on vertical movement.
+            </p>
+        </div>
+
+
+
+        <br><br>
+
+        <div style="display: flex; justify-content: center; align-items: center">
+            <a href="home.php" class="button">RETURN HOME</a>
+        </div>
+
+
+        <script>
+            let homeButton = document.getElementsByClassName("button")[0];
+
+            
+            homeButton.addEventListener("mouseover", function() {
+                homeButton.style.backgroundColor = "rgb(255, 255, 135)";
+            });
+
+            homeButton.addEventListener("mouseout", function() {
+                homeButton.style.backgroundColor = "aquamarine";
+            });
+
+
+            
+
+        </script>
+	</body>
+</html>
