@@ -25,4 +25,8 @@ if (file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX)
 } else {
     echo json_encode(['status' => 'error']);
 }
+<<<<<<< HEAD
 ?>
+=======
+?>
+>>>>>>> a3d0d9e5aa49ad4bb8f98b513c6d11e5eb4025b6

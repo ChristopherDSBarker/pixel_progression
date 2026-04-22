@@ -300,4 +300,8 @@ function saveGame() {
     });
 }
 
+<<<<<<< HEAD
 requestAnimationFrame(gameLoop);
+=======
+requestAnimationFrame(gameLoop);
+>>>>>>> a3d0d9e5aa49ad4bb8f98b513c6d11e5eb4025b6
