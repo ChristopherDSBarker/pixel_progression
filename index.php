@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header("Location: home.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +32,10 @@
         </div>
 
         <p id="storyText"></p>
+
+        <!-- optional logout -->
+        <br>
+        <a href="logout.php">Logout</a>
     </div>
 </div>
 
