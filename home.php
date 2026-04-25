@@ -1,7 +1,9 @@
+<?php session_start() ?>
+
 <html>
 	<head>
 		<title>Home</title>
-        <link rel="stylesheet" href="style_home.css">
+        <link rel="stylesheet" href="style_home.css?v=1">
         <link rel="icon" type="image/png" href="conceptlogo.png">
 	</head>
 
@@ -18,12 +20,10 @@
 
         <?php
         //DISPLAYS THIS MESSAGE AFTER LOGGING IN>
-        if (isset($_GET['log'])) {
-            session_start();
-               ?>
+        if (isset($_SESSION['username'])) { ?>
             <div style="display: flex; justify-content: center; align-items: center;">
                 <span style="font-size: 15px; color: white; font-family: monospace; display: inline-block">
-                    Welcome,  <span style="color: aquamarine"><?php echo $_SESSION['username'] ?></span>
+                    Welcome, <span style="color: aquamarine"><?php echo $_SESSION['username'] ?></span>
                 !</span>
             </div>
         <?php } ?>
@@ -31,24 +31,34 @@
         <br>
 
         <div style="display: flex; justify-content: center; align-items: center">
-            <a href="index.html" class="button">START GAME</a>
+            <?php 
+                if (isset($_SESSION['username'])) { ?>
+                <a href="index.php" class="button">START GAME</a> 
+            <?php } ?>
+        </div>
+
+        <br>
+
+        <div style="display: flex; justify-content: center; align-items: center">
+            <a href="htp.html" class="button">HOW TO PLAY</a>
         </div>
 
         <br>
 
         <div style="display: flex; justify-content: center; align-items: center">
             <?php
-            if (isset($_GET['log'])) {
-                ?>
-                <a href="home.php" id="signout" class="button">LOG OUT</a>
+            if (isset($_SESSION['username'])) { ?>
+                <a href="logout.php" id="signout" class="button">LOG OUT</a>
             <?php } else { ?>
                 <a href="login.php" id="signout" class="button">LOG IN</a>
             <?php } ?>
         </div>
 
         <script>
+
             let playButton = document.getElementsByClassName("button")[0];
             let logButton = document.getElementsByClassName("button")[1];
+            let htpButton = document.getElementsByClassName("button")[2];
             
             playButton.addEventListener("mouseover", function() {
                 playButton.style.backgroundColor = "rgb(255, 255, 135)";
@@ -65,11 +75,16 @@
             logButton.addEventListener("mouseout", function() {
                 logButton.style.backgroundColor = "aquamarine";
             });
+
+            htpButton.addEventListener("mouseover", function() {
+                htpButton.style.backgroundColor = "rgb(255, 255, 135)";
+            });
+
+            htpButton.addEventListener("mouseout", function() {
+                htpButton.style.backgroundColor = "aquamarine";
+            });
             
 
         </script>
-
-
- 
 	</body>
 </html>
