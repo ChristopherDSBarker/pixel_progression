@@ -6,6 +6,9 @@
 	</head>
 
 	<body style="background-color: teal">
+
+        <audio id="sfx_hover" src="sfx_btn_hover.mp3" preload="auto"></audio>
+
         <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
             <h1 id="title1">P i x e l</h1>
             <h1 id="title2"> P r o g r e s s i o n </h1>
@@ -37,10 +40,13 @@
 
         <script>
             let homeButton = document.getElementsByClassName("button")[0];
+            let sfxHover = document.getElementById("sfx_hover");
 
             
             homeButton.addEventListener("mouseover", function() {
                 homeButton.style.backgroundColor = "rgb(255, 255, 135)";
+                sfxHover.currentTime = 0;
+                sfxHover.play();
             });
 
             homeButton.addEventListener("mouseout", function() {
