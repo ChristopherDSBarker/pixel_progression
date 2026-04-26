@@ -7,6 +7,24 @@ h1 {
     font-size: 40px;
 }
 
+table {
+    border: 2px dashed black;
+    padding: 5px;
+    background-color: rgb(255, 255, 135);
+}
+
+img {
+    position: absolute;
+    top: 70%;
+    left: 44.3%;
+    
+    border: 5px ridge black;
+    padding: 5px;
+    width: 10%;
+    background-color: mediumseagreen;
+    opacity: 65%;
+}
+
 #title1 {
     color: rgb(255, 255, 135);
     text-shadow: -2px 0px 0 black;
@@ -33,22 +51,4 @@ h1 {
     padding-top: 10px;
     padding-bottom: 10px;
     width: 350px;
-}
-
-table {
-    border: 2px dashed black;
-    padding: 5px;
-    background-color: rgb(255, 255, 135);
-}
-
-img {
-    position: absolute;
-    top: 4%;
-    left: 44.3%;
-    
-    border: 5px ridge black;
-    padding: 5px;
-    width: 10%;
-    background-color: mediumseagreen;
-    opacity: 65%;
 }

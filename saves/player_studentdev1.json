@@ -1,0 +1,10 @@
+{
+    "playerId": "student_dev_1",
+    "health": 240,
+    "candies": 1,
+    "level": 8,
+    "stats": {
+        "jumpHeight": 600,
+        "speed": 200
+    }
+}
