@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="design.css"/>
 	</head>
 
-	<body style="background-color: teal">
+	<body style="background-color: teal; border: 10px double black; padding: 15px">
 
         <h1>
             <u style="color: rgb(255, 255, 135); text-shadow: 2px 2px 2px black">
