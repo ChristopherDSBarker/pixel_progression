@@ -96,8 +96,8 @@ loadLevel(1);
 // INPUT
 // ------------------
 let keys = {};
-window.addEventListener('keydown', e => keys[e.code] = true);
-window.addEventListener('keyup', e => keys[e.code] = false);
+document.addEventListener('keydown', e => keys[e.code] = true);
+document.addEventListener('keyup', e => keys[e.code] = false);
 
 // ------------------
 // LOOP (MINIMAL CHANGE)
@@ -136,9 +136,8 @@ function updateCamera() {
 // PHYSICS (UNCHANGED)
 // ------------------
 function updatePhysics(deltaTime) {
-
-    if (keys['ArrowRight']) player.vx = player.speed;
-    else if (keys['ArrowLeft']) player.vx = -player.speed;
+    if (keys['ArrowRight'] || keys['KeyD']) player.vx = player.speed;
+    else if (keys['ArrowLeft'] || keys['KeyA']) player.vx = -player.speed;
     else player.vx = 0;
 
     player.x += player.vx * deltaTime;
@@ -181,7 +180,10 @@ function updatePhysics(deltaTime) {
         }
     }
 
-    if (keys['Space'] && player.grounded) {
+    if ( (keys['ArrowUp'] || keys['KeyW'] || keys['Space']) && player.grounded) {
+        let sfxJump = document.getElementById("sfx_jump");
+        sfxJump.play();
+
         player.vy = -player.jumpHeight;
     }
 
@@ -191,6 +193,9 @@ function updatePhysics(deltaTime) {
         player.y < star.y + star.height &&
         player.y + player.height > star.y
     ) {
+        let sfxWin = document.getElementById("sfx_win");
+        sfxWin.play();
+
         nextLevel = player.level + 1;
         gameState = 'MENU';
         document.getElementById('levelStatus').style.display = 'block';
@@ -250,10 +255,58 @@ function updateUI() {
 
         if (!storyText.innerText.includes("merchant")) {
             storyText.innerText = "The candy merchant appears and offers you upgrades...";
+
+            let sfxMerchant1 = document.getElementById("sfx_hey");
+            sfxMerchant1.play();
         }
     } else {
         upgradeButtons.style.display = 'none';
     }
+}
+
+// ------------------
+// ENEMIES (NEW)
+// ------------------
+function updateObstacles() {
+    let obstacle = {
+    x: 600,
+    y: 300,
+    w: 30,
+    h: 30,
+    speed: 5
+    }
+
+    obstacle.x -= (obstacle.speed + speedBonus);
+
+    if (obstacle.x < -30) {    if (obstacle.x < -30) {
+        obstacle.x = 800;        obstacle.x = 800;
+
+        // level complete
+        state = "post";
+        showPost();
+    }
+
+    // collision
+    if (
+        player.x < obstacle.x + obstacle.w &&
+        player.x + player.w > obstacle.x &&
+        player.y < obstacle.y + obstacle.h &&
+        player.y + player.h > obstacle.y
+    ) {
+        if (!player.invincible) {
+            player.health -= 10;
+            player.invincible = true;
+
+            setTimeout(() => {
+                player.invincible = false;
+            }, 1000);
+        }
+    }
+
+    document.getElementById("health").innerText = player.health;
+}
+
+
 }
 
 // ------------------
@@ -266,6 +319,12 @@ document.getElementById('btnUpgradeSpeed').addEventListener('click', () => apply
 function applyUpgrade(type) {
     if (candies >= 10) {
         candies -= 10;
+
+        let sfxUpgrade = document.getElementById("sfx_upgrade");
+        sfxUpgrade.play();
+
+        let sfxMerchant2 = document.getElementById("sfx_comeagain");
+        sfxMerchant2.play();
 
         if (type === 'health') player.health += 20;
         if (type === 'jump') player.jumpHeight += 50;
@@ -300,8 +359,4 @@ function saveGame() {
     });
 }
 
-<<<<<<< HEAD
 requestAnimationFrame(gameLoop);
-=======
-requestAnimationFrame(gameLoop);
->>>>>>> a3d0d9e5aa49ad4bb8f98b513c6d11e5eb4025b6

@@ -5,25 +5,23 @@
 
 
         <link rel="icon" type="image/png" href="conceptlogo.png"/>
-        <link rel="stylesheet" href="design.css"/>
+        <link rel="stylesheet" href="style_login.css"/>
 	</head>
 
-	<body style="background-color: teal; border: 10px double black; padding: 15px">
+	<body style="background-color: teal">
 
-        <h1>
-            <u style="color: rgb(255, 255, 135); text-shadow: 2px 2px 2px black">
-                <span style="color: rgb(255, 255, 135); border-bottom: none; text-shadow: 2px 2px 2px black">P i x e l</span><br>
-            </u>
-            <u style="color: skyblue; text-shadow: 2px 2px 2px black">
-                <span style="color: skyblue; border-bottom: none; text-shadow: 2px 2px 2px black">P r o g r e s s i o n</span>
-            </u>
-        </h1>
+        <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
+            <h1 id="title1">P i x e l</h1>
+            <h1 id="title2"> P r o g r e s s i o n </h1>
+        </div>
+
+        <br><br>
 
         <!-- BORDER WRAPPED AROUND FORM, LOGO, AND MORE -->
         <div class="content">
 
             <div class="logodiv" style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 35px">Register for an account!</span><br><br>
+                <span style="font-size: 35px; font-family: monospace">Register for an account!</span><br><br>
                 <img src="conceptlogo.png">
             </div>
             <br>
@@ -54,7 +52,7 @@
                     exit();
                 } else {
                     ?>
-                    <span style="color: red; border-bottom: none">An account with that username already exists.</span><br><br>
+                    <span style="color: red; border-bottom: none; font-family: monospace">An account with that username already exists.</span><br><br>
                     <?php
                 }
             }
@@ -65,27 +63,27 @@
                 <form method="POST" action="register.php">
                     <tr>
                         <td> 
-                            <span style="padding: 0px">Username:</span> 
+                            <span style="padding: 0px; font-family: monospace">Username:</span> 
                             <input style="border: 2px solid black" type="text" name="username" id="username" required><br><br> 
                         </td>
                     </tr>
                     <tr>
                         <td> 
-                            <span style="padding: 0px">Password:</span> 
+                            <span style="padding: 0px; font-family: monospace">Password:</span> 
                             <input style="border: 2px solid black" type="password" name="password" id="password" required><br><br>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <button type="submit">Register</button> 
+                            <button type="submit" style="font-family: monospace">Register</button> 
                         </td>
                     </tr>
                 </form>
             </table>
             <!-- IF THE USER HAS AN ACCOUNT, TAKES LINK TO login.php -->
-            <p>Have an account? <a href="login.php">Log in here!</a></p>
+            <p style="font-family: monospace">Have an account? <a href="login.php" style="font-family: monospace">Log in here!</a></p>
             <!-- TAKES USER TO home.php -->
-            <a href="home.php">Home!</a><br><br>
+            <a href="home.php" style="font-family: monospace">Return Home!</a><br><br>
 
         </div>
 	</body>

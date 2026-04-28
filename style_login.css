@@ -1,12 +1,11 @@
 
 h1 {
-    border: 5px black ridge;
-    padding: 15px;
+    position: relative;
+    
+    padding-top: 10px;
     text-align: center;
-    background-color: aquamarine;
-    font-family: sans-serif;
-    box-shadow: 3px 3px 3px black;
-    font-size: 50;
+    font-family: monospace;
+    font-size: 40px;
 }
 
 table {
@@ -26,6 +25,17 @@ span {
     border: 2px solid black;
     padding: 5px;
     display: inline-block;
+}
+
+#title1 {
+    color: rgb(255, 255, 135);
+    text-shadow: -2px 0px 0 black;
+}
+
+#title2 {
+    padding-top: 1px;
+    color: skyblue;
+    text-shadow: -2px 0px 0 black;
 }
 
 img {
