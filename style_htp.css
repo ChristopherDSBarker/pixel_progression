@@ -1,0 +1,71 @@
+h1 {
+    border: 5px black ridge;
+    padding: 15px;
+    text-align: center;
+    background-color: aquamarine;
+    font-family: monospace;
+    box-shadow: 3px 3px 3px black;
+    font-size: 50;
+}
+
+span {
+    border-bottom: 2px solid black;
+    padding: 5px;
+    font-family: monospace;
+}
+
+h2 {
+    position: relative;
+    
+    padding-top: 10px;
+    text-align: center;
+
+    font-family: monospace;
+    font-size: 40px;
+
+    color: rgb(255, 255, 135);
+    text-shadow: 2px 2px 2px black;
+}
+
+table {
+    border: 2px dashed black;
+    padding: 5px;
+    background-color: rgb(255, 255, 135);
+}
+
+img {
+    border: 8px ridge white;
+    padding: 2px;
+    width: 100px;
+    background-color: mediumseagreen;
+    box-shadow: 3px 3px 3px black;
+}
+
+#title1 {
+    color: rgb(255, 255, 135); 
+    border-bottom: none; 
+    text-shadow: 2px 2px 2px black;
+}
+
+#title2 {
+    color: skyblue; 
+    border-bottom: none; 
+    text-shadow: 2px 2px 2px black;
+}
+
+.button {
+    background-color: aquamarine;
+    border: 5px ridge black;
+    border-radius: 5px;
+    border-width: 2px;
+
+    color: black;
+    font-size: 30px;
+    font-family: monospace;
+    text-decoration: none;
+    text-align: center;
+
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 350px;
+}

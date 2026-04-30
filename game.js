@@ -89,32 +89,38 @@ function loadLevel(level) {
     }
 }
 
-// initial load
-loadLevel(1);
-
 // ------------------
 // INPUT
 // ------------------
 let keys = {};
-window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keydown', (e) => {
+    let keyBlock = ["ArrowLeft", "ArrowRight", " "];
+    keys[e.code] = true;
+    if (keyBlock.includes(e.key)) {
+        e.preventDefault();
+    }
+});
 window.addEventListener('keyup', e => keys[e.code] = false);
 
 // ------------------
 // LOOP (MINIMAL CHANGE)
 // ------------------
 function gameLoop(currentTime) {
+    resourceDisplay.innerText = `Candies: ${candies}`;
+    healthDisplay.innerText = `Health: ${player.health}`;
     let deltaTime = (currentTime - lastTime) / 1000;
     if (deltaTime > 0.1) deltaTime = 0.1;
     lastTime = currentTime;
 
-    timeSinceLastCandy += deltaTime;
-    if (timeSinceLastCandy >= 1.0) {
-        candies++;
-        timeSinceLastCandy = 0;
-        updateUI();
-    }
-
     if (gameState === 'PLAYING') {
+
+        timeSinceLastCandy += deltaTime;
+        if (timeSinceLastCandy >= 1.0) {
+            candies++;
+            timeSinceLastCandy = 0;
+            updateUI();
+        }
+
         updatePhysics(deltaTime);
     }
 
@@ -183,6 +189,7 @@ function updatePhysics(deltaTime) {
 
     if (keys['Space'] && player.grounded) {
         player.vy = -player.jumpHeight;
+        
     }
 
     if (
@@ -191,7 +198,11 @@ function updatePhysics(deltaTime) {
         player.y < star.y + star.height &&
         player.y + player.height > star.y
     ) {
-        nextLevel = player.level + 1;
+        if (player.level < 2) {
+            nextLevel = player.level + 1;
+        } else {
+            nextLevel = 2;
+        }
         gameState = 'MENU';
         document.getElementById('levelStatus').style.display = 'block';
         updateUI();
@@ -244,11 +255,13 @@ const storyText = document.getElementById('storyText');
 function updateUI() {
     resourceDisplay.innerText = `Candies: ${candies}`;
     healthDisplay.innerText = `Health: ${player.health}`;
+    console.log(player.health);
 
-    if (candies >= 10 && gameState === 'MENU') {
+    if (gameState === 'MENU') {
         upgradeButtons.style.display = 'block';
 
         if (!storyText.innerText.includes("merchant")) {
+            storyText.style = "color: aquamarine";
             storyText.innerText = "The candy merchant appears and offers you upgrades...";
         }
     } else {
@@ -262,22 +275,41 @@ function updateUI() {
 document.getElementById('btnUpgradeHealth').addEventListener('click', () => applyUpgrade('health'));
 document.getElementById('btnUpgradeJump').addEventListener('click', () => applyUpgrade('jump'));
 document.getElementById('btnUpgradeSpeed').addEventListener('click', () => applyUpgrade('speed'));
+document.getElementById('btnNextLevel').addEventListener('click', () => applyUpgrade('none'));
 
 function applyUpgrade(type) {
-    if (candies >= 10) {
-        candies -= 10;
+    if (type === 'health' || type === 'jump' || type === 'speed') {
+        if (candies >= 10) {
+            gameState = 'PLAYING';
+            candies -= 10;
 
-        if (type === 'health') player.health += 20;
-        if (type === 'jump') player.jumpHeight += 50;
-        if (type === 'speed') player.speed += 50;
+            if (type === 'health') player.health += 20;
+            if (type === 'jump') player.jumpHeight += 50;
+            if (type === 'speed') player.speed += 50;
 
+            player.level = nextLevel;
+            loadLevel(player.level);
+
+            document.getElementById('levelStatus').style.display = 'none';
+            storyText.innerText = "";
+
+            updateUI();
+            saveGame();
+        } else {
+            let p = document.getElementById("poor");
+            p.style = "display: show; color: red";
+        }
+    }
+    if (type === 'none') {
+        let p = document.getElementById("poor");
+        p.style = "display: none";
+        gameState = 'PLAYING';
         player.level = nextLevel;
         loadLevel(player.level);
 
         document.getElementById('levelStatus').style.display = 'none';
         storyText.innerText = "";
 
-        gameState = 'PLAYING';
         updateUI();
         saveGame();
     }
@@ -295,9 +327,28 @@ function saveGame() {
             health: player.health,
             candies: candies,
             level: player.level,
-            stats: { jumpHeight: player.jumpHeight, speed: player.speed }
+            jumpHeight: player.jumpHeight,
+            speed: player.speed
         })
-    });
+    })
+    .then(res => res.json());
 }
 
-requestAnimationFrame(gameLoop);
+function logoutAndSave() {
+    fetch('save.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            playerId: "student_dev_1",
+            health: player.health,
+            candies: candies,
+            level: player.level,
+            jumpHeight: player.jumpHeight,
+            speed: player.speed
+        })
+    })
+    .then(res => res.json())
+    .then(data => window.location.href = "logout.php");
+}
+
+window.startGame = () => requestAnimationFrame(gameLoop);

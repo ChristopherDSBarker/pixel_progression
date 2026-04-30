@@ -1,28 +1,38 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 
 // Capture raw payload from Fetch API
 $jsonPayload = file_get_contents('php://input');
 $data = json_decode($jsonPayload, true);
 
-if (!$data ||!isset($data['playerId'])) {
+if (!$data || !isset($data['playerId'])) {
     echo json_encode(['status' => 'error', 'message' => 'Invalid data payload']);
     exit;
 }
 
-// Sanitize player ID to prevent Path Traversal vulnerabilities
-$safePlayerId = preg_replace("/[^a-zA-Z0-9]+/", "", $data['playerId']);
-$filename = 'saves/player_'. $safePlayerId. '.json';
+$username = $_SESSION['username'];
+$health = $data['health'];
+$candies = $data['candies'];
+$jumpheight = $data['jumpHeight'];
+$speed = $data['speed'];
+$level = $data['level'];
 
-// Ensure the directory exists
-if (!file_exists('saves')) {
-    mkdir('saves', 0777, true);
-}
+$username = $_SESSION['username'];
+$statsdb = new SQLite3("account.db");
+$query = "SELECT * FROM STATS WHERE L_USERNAME = '$username'";
+$success = $statsdb->query($query);
 
-// Save securely using an exclusive lock
-if (file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX)) {
-    echo json_encode(['status' => 'success']);
+$row = $success->fetchArray(SQLITE3_ASSOC);
+if ($row) {
+    $update = "UPDATE STATS SET S_LEVEL = '$level', S_JUMPHEIGHT = '$jumpheight', S_SPEED = '$speed',
+        S_HEALTH = '$health', S_CANDIES = '$candies' WHERE L_USERNAME = '$username'";
+    $statsdb->exec($update);
 } else {
-    echo json_encode(['status' => 'error']);
+    $save = "INSERT INTO STATS (L_USERNAME, S_LEVEL, S_JUMPHEIGHT, S_SPEED, S_HEALTH, S_CANDIES)
+        VALUES ('$username', '$level', '$jumpheight', '$speed', '$health', '$candies')";
+    $statsdb->exec($save);
 }
+echo json_encode(['status' => 'success']);
+exit;
 ?>
