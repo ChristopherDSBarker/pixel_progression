@@ -9,8 +9,7 @@
 
 	<body style="background-color: teal">
 
-        <audio id="sfx_hover" src="sfx_btn_hover.mp3" preload="auto"></audio>
-        <audio id="sfx_click" src="sfx_btn_click.mp3" preload="auto"></audio>
+        <audio id="sfx_hover" src="assets/sfx_btn_hover.mp3" preload="auto"></audio>
 
         <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
             <img src="conceptlogo.png"></img>
@@ -59,44 +58,19 @@
 
         <script>
 
-            let playButton = document.getElementsByClassName("button")[0];
-            let logButton = document.getElementsByClassName("button")[1];
-            let htpButton = document.getElementsByClassName("button")[2];
-
+            let buttons = document.querySelectorAll(".button");
             let sfxHover = document.getElementById("sfx_hover");
-            let sfxClick = document.getElementById("sfx_click");
-            
-            playButton.addEventListener("mouseover", function() {
-                playButton.style.backgroundColor = "rgb(255, 255, 135)";
-                sfxHover.currentTime = 0;
-                sfxHover.play();
-            });
 
-            playButton.addEventListener("mouseout", function() {
-                playButton.style.backgroundColor = "aquamarine";
+            buttons.forEach(b => {
+                b.addEventListener("mouseover", function() {
+                    b.style.backgroundColor = "rgb(255, 255, 135)";
+                    sfxHover.currentTime = 0;
+                    sfxHover.play();
+                });
+                b.addEventListener("mouseout", function() {
+                    b.style.backgroundColor = "aquamarine";
+                });
             });
-
-            logButton.addEventListener("mouseover", function() {
-                logButton.style.backgroundColor = "rgb(255, 255, 135)";
-                sfxHover.currentTime = 0;
-                sfxHover.play();
-            });
-
-            logButton.addEventListener("mouseout", function() {
-                logButton.style.backgroundColor = "aquamarine";
-            });
-
-            htpButton.addEventListener("mouseover", function() {
-                htpButton.style.backgroundColor = "rgb(255, 255, 135)";
-                sfxHover.currentTime = 0;
-                sfxHover.play();
-            });
-
-            htpButton.addEventListener("mouseout", function() {
-                htpButton.style.backgroundColor = "aquamarine";
-            });
-            
-
         </script>
 	</body>
 </html>
