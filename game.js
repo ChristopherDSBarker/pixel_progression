@@ -179,7 +179,7 @@ function loadLevel(level) {
         obstacles = [
             { x: 0, y: 480, width: 120, height: 20 },
             { x: 240, y: 480, width: 50, height: 20 },
-            { x: 340, y: 380, width: 120, height: 20, moving: 'y', minY: 250, maxY: 450, direction: 1, speed: 90},
+            { x: 340, y: 380, width: 120, height: 20, moving: 'y', minY: 250, maxY: 475, direction: 1, speed: 90},
             { x: 340, y: 190, width: 60, height: 20 },
             { x: 100, y: 340, width: 150, height: 20 },
             { x: 10, y: 300, width: 50, height: 20 },

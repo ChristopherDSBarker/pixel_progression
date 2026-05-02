@@ -61,6 +61,7 @@ if (!isset($_SESSION['username'])) {
 
         <!-- optional logout -->
         <br>
+        <a href="home.php">Home</a>
         <a id="logout" href="logout.php">Logout</a>
     </div>
 </div>
