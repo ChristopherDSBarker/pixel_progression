@@ -231,52 +231,110 @@ function loadLevel(level) {
 
     if (level === 4) {
         obstacles = [
-            { x: 0, y: 480, width: 300, height: 20 },
-            { x: 400, y: 480, width: 30, height: 20 },
+            { x: 0, y: 480, width: 800, height: 20 },
 
+            // staggered platforms (force movement)
+            { x: 200, y: 420, width: 100, height: 20 },
+            { x: 500, y: 360, width: 100, height: 20 },
+            { x: 300, y: 300, width: 100, height: 20 }
         ];
 
-        enemies = [{
-            x: 400, 
-            y: 455, 
-            width: 20, 
-            height: 25, 
-            minX: 0,
-            maxX: 0, 
-            moving: false,
-            direction: -1,
-            speed: 0,
-            damage: 30,
-            right_sprite: enem_marksman_r, 
-            left_sprite: enem_marksman_l },
+        enemies = [
+            {
+                x: 400,
+                y: 455,
+                width: 20,
+                height: 25,
+                moving: false,
+                direction: -1,
+                speed: 0,
+                damage: 25,
+                right_sprite: enem_marksman_r,
+                left_sprite: enem_marksman_l
+            }
         ];
 
-        projectiles = [{
-            x: 400, 
-            y: 455, 
-            width: 20, 
-            height: 4, 
-            minX: canvas.width,
-            maxX: 400,
-            direction: -1,
-            speed: 20,
-            damage: 25,
-            type: 'b',
-            hit: false,
-            right_sprite: enem_bullet_r,
-            left_sprite: enem_bullet_l }
+        // CLEAN PROJECTILE SET (no crash, controlled lanes)
+        projectiles = [
+            // LOW LANE (forces jumping)
+            {
+                x: 600,
+                y: 455,
+                width: 20,
+                height: 4,
+                minX: canvas.width,
+                maxX: 0,
+                direction: -1,
+                speed: 14,
+                damage: 15,
+                type: 'b',
+                hit: false,
+                right_sprite: enem_bullet_r,
+                left_sprite: enem_bullet_l
+            },
+            // MID LANE (forces positioning)
+            {
+                x: 750,
+                y: 420,
+                width: 20,
+                height: 4,
+                minX: canvas.width,
+                maxX: 0,
+                direction: -1,
+                speed: 10,
+                damage: 15,
+                type: 'b',
+                hit: false,
+                right_sprite: enem_bullet_r,
+                left_sprite: enem_bullet_l
+            },
+            // HIGH LANE (forces staying low sometimes)
+            {
+                x: 500,
+                y: 380,
+                width: 20,
+                height: 4,
+                minX: canvas.width,
+                maxX: 0,
+                direction: -1,
+                speed: 8,
+                damage: 15,
+                type: 'b',
+                hit: false,
+                right_sprite: enem_bullet_r,
+                left_sprite: enem_bullet_l
+            },
+            // FAST CHAOS SHOT (panic bullet)
+            {
+                x: 700,
+                y: 440,
+                width: 20,
+                height: 4,
+                minX: canvas.width,
+                maxX: 0,
+                direction: -1,
+                speed: 20,
+                damage: 20,
+                type: 'b',
+                hit: false,
+                right_sprite: enem_bullet_r,
+                left_sprite: enem_bullet_l
+            }
         ];
 
-        powerups = [{
-            x: 150, 
-            y: 445, 
-            width: 30, 
-            height: 35,  
-            type: 's',
-            sprite: p_shield }
+        powerups = [
+            {
+                x: 380,
+                y: 440,
+                width: 30,
+                height: 35,
+                type: 's',
+                sprite: p_shield
+            }
         ];
 
-        star = { x: 200, y: 130, width: 20, height: 20 };
+        // reward is high → encourages mastery
+        star = { x: 350, y: 250, width: 20, height: 20 };
     }
 }
 
@@ -481,12 +539,11 @@ function updatePhysics(deltaTime) {
         }
 
         if (pr.type === 'b') {
-            interval += deltaTime;
-            if (interval >= 3) {
-                interval = 0;
-                ctx.drawImage(p.sprite, p.x, p.y, p.width, p.height);
+            pr.x += pr.direction * pr.speed * deltaTime;
+            if (pr.x < 0) {
+                pr.x = 400;
+                pr.y = 455;
             }
-                pr.x += pr.direction * pr.speed * deltaTime;
         }
     }
 
@@ -607,6 +664,11 @@ function drawCanvas() {
         ctx.drawImage(p.sprite, p.x, p.y, p.width, p.height);
     }
 
+    for (let pr of projectiles) {
+        let sprite = pr.direction === 1 ? pr.right_sprite : pr.left_sprite;
+        ctx.drawImage(sprite, pr.x, pr.y, pr.width, pr.height);
+    }
+
     ctx.fillRect(borderL.x, borderL.y, borderL.width, borderL.height);
     ctx.fillRect(borderR.x, borderR.y, borderR.width, borderR.height);
 
@@ -662,6 +724,9 @@ function updateUI() {
         canvas.style.display = 'none';
         resourceDisplay.style.display = 'none';
         healthDisplay.style.display = 'none';
+
+        let homeBtn = document.getElementById("return");
+        homeBtn.style.display = 'none';
         let logoutBtn = document.getElementById("logout");
         logoutBtn.style.display = 'none';
 
@@ -796,7 +861,7 @@ function saveGame() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             playerId: "student_dev_1",
-            health: player.health,
+            health: player.maxHealth,
             candies: candies,
             level: player.level,
             stats: { jumpHeight: player.jumpHeight, speed: player.speed }
