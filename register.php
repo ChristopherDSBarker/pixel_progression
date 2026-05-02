@@ -33,7 +33,7 @@
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $username = $_POST['username'];
                 $password = $_POST['password'];
-                $logindb = new SQLite3("account.db");
+                $logindb = new SQLite3("login.db");
 
                 $query2 = "SELECT * FROM LOGININFO";
                 $result = $logindb->query($query2);

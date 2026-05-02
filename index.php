@@ -36,7 +36,7 @@
             }
 
             $username = $_SESSION['username'];
-            $statsdb = new SQLite3("account.db");
+            $statsdb = new SQLite3("login.db");
             $query = "SELECT * FROM STATS WHERE L_USERNAME = '$username'";
             $success = $statsdb->query($query);
 
