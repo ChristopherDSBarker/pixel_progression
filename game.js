@@ -481,12 +481,7 @@ function updatePhysics(deltaTime) {
         }
 
         if (pr.type === 'b') {
-            interval += deltaTime;
-            if (interval >= 3) {
-                interval = 0;
-                ctx.drawImage(p.sprite, p.x, p.y, p.width, p.height);
-            }
-                pr.x += pr.direction * pr.speed * deltaTime;
+            console.log("Imagine a bullet projectile here")
         }
     }
 
@@ -662,6 +657,9 @@ function updateUI() {
         canvas.style.display = 'none';
         resourceDisplay.style.display = 'none';
         healthDisplay.style.display = 'none';
+
+        let homeBtn = document.getElementById("return");
+        homeBtn.style.display = 'none';
         let logoutBtn = document.getElementById("logout");
         logoutBtn.style.display = 'none';
 
@@ -796,7 +794,7 @@ function saveGame() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             playerId: "student_dev_1",
-            health: player.health,
+            health: player.maxHealth,
             candies: candies,
             level: player.level,
             stats: { jumpHeight: player.jumpHeight, speed: player.speed }
