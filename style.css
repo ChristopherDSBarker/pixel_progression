@@ -20,10 +20,29 @@ body {
 .ui-button {
     padding: 6px 10px;
     margin: 5px;
+    font-family: monospace;
     cursor: pointer;
 }
 
 .ui-button:hover {
     background: white;
+    font-family: monospace;
     color: black;
+}
+
+.menu-button {
+    background-color: black;
+    border: 5px ridge white;
+    border-radius: 5px;
+    border-width: 2px;
+
+    color: white;
+    font-size: 30px;
+    font-family: monospace;
+    text-decoration: none;
+    text-align: center;
+
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 350px;
 }

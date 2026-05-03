@@ -3,7 +3,7 @@
 		<title>Login</title>
 
         <link rel="icon" type="image/png" href="conceptlogo.png"/>
-        <link rel="stylesheet" href="design.css"/>
+        <link rel="stylesheet" href="style_login.css"/>
 
 	</head>
 

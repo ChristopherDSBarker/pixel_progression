@@ -8,12 +8,6 @@ h1 {
     font-size: 50;
 }
 
-span {
-    border-bottom: 2px solid black;
-    padding: 5px;
-    font-family: monospace;
-}
-
 h2 {
     position: relative;
     
@@ -21,7 +15,7 @@ h2 {
     text-align: center;
 
     font-family: monospace;
-    font-size: 40px;
+    font-size: 35;
 
     color: rgb(255, 255, 135);
     text-shadow: 2px 2px 2px black;
