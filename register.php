@@ -33,8 +33,13 @@
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $username = $_POST['username'];
                 $password = $_POST['password'];
-                $logindb = new SQLite3("login.db");
+                $file_exist = file_exists("login.db");
 
+                if (!$file_exist) {
+                    include "init_db.php";
+                }
+
+                $logindb = new SQLite3("login.db");
                 $query2 = "SELECT * FROM LOGININFO";
                 $result = $logindb->query($query2);
                 $accexists = false;

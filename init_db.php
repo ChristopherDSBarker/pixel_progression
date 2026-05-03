@@ -1,12 +1,20 @@
 <?php
-$db = new SQLite3(__DIR__ . '/game.db');
+$db = new SQLite3(__DIR__ . '/login.db');
 
 $db->exec("
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    password TEXT
+CREATE TABLE LOGININFO (
+    L_USERNAME TEXT PRIMARY KEY,
+    L_PASSWORD TEXT
 )");
 
-echo "TABLE CREATED";
+$db->exec("
+CREATE TABLE STATS (
+    L_USERNAME TEXT PRIMARY KEY,
+    S_LEVEL,
+    S_JUMPHEIGHT,
+    S_SPEED,
+    S_HEALTH,
+    S_CANDIES,
+    FOREIGN KEY (L_USERNAME) REFERENCES LOGININFO(L_USERNAME)
+);");
 ?>
