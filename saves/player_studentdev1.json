@@ -1,10 +1,10 @@
 {
     "playerId": "student_dev_1",
     "health": 100,
-    "candies": 4,
-    "level": 4,
+    "candies": 8,
+    "level": 5,
     "stats": {
-        "jumpHeight": 300,
+        "jumpHeight": 500,
         "speed": 150
     }
 }

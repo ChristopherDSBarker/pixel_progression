@@ -476,12 +476,12 @@ function updatePhysics(deltaTime) {
     
     for (let pr of projectiles) {
         if (pr.type === 'f') {
-            console.log("Imagine a fireball projectile here")
+            console.log("Imagine a fireball projectile here");
 
         }
 
         if (pr.type === 'b') {
-            console.log("Imagine a bullet projectile here")
+            console.log("Imagine a bullet projectile here");
         }
     }
 
