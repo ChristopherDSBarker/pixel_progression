@@ -57,7 +57,7 @@
             <?php } ?>
         </div>
 
-        <br>
+        <br><br>
 
         <div style="display: flex; justify-content: center; align-items: center">
             <img src="conceptlogo.png"/>
