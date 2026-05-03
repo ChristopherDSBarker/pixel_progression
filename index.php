@@ -62,13 +62,12 @@
 
         <br>
         <!-- optional logout -->
-        <a id="return" href="home.php">
-            <button style="background-color: aquamarine; border: 2px solid black; font-family: monospace">Home</button>
-        </a>
-        <button id="logout" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="logoutAndSave()">Log out</button>
-        <!-- <a id="return" href="reset.php">
+        <!-- <a id="return" href="home.php">
             <button style="background-color: aquamarine; border: 2px solid black; font-family: monospace">Home</button>
         </a> -->
+        <button id="return" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="home()">Home</button>
+        <button id="logout" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="logoutAndSave()">Log out</button>
+        <button id="reset" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="reset()">Reset?</button>
     </div>
 </div>
 

@@ -660,6 +660,8 @@ function updateUI() {
         homeBtn.style.display = 'none';
         let logoutBtn = document.getElementById("logout");
         logoutBtn.style.display = 'none';
+        let resetBtn = document.getElementById("reset");
+        resetBtn.style.display = 'none';
 
         gameOver();
     }
@@ -825,3 +827,31 @@ function logoutAndSave() {
 }
 
 window.startGame = () => requestAnimationFrame(gameLoop);
+
+// ------------------
+// RESET
+// ------------------
+function reset() {
+    let ans = confirm("Are you sure you want to reset your progress?");
+    if (ans) {
+        window.location.href = "reset.php";
+    }
+}
+
+// ------------------
+// RESET
+// ------------------
+function home() {
+    window.location.href = "home.php";
+}
+
+
+// ------------------
+// CHEAT CODES
+// ------------------
+/*
+Complete Level: Hold C & P
+Enable High Jump: Hold J & P
+Instant Death Button: Hold I & P
+Max Health: Hold F & P
+*/
