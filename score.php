@@ -1,4 +1,5 @@
 <?php
+session_start();
 header('Content-Type: application/json');
 
 $jsonPayload = file_get_contents('php://input');
@@ -9,52 +10,96 @@ if (!$data || !isset($data['playerId']) || !isset($data['timeSeconds'])) {
     exit;
 }
 
-$safePlayerId = preg_replace("/[^a-zA-Z0-9]+/", "", $data['playerId']);
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : $data['playerId'];
+$safePlayerId = trim(preg_replace("/[^a-zA-Z0-9_ -]+/", "", $username));
 $timeSeconds = floatval($data['timeSeconds']);
-$timeFormatted = isset($data['timeFormatted']) ? preg_replace("/[^0-9:.]+/", "", $data['timeFormatted']) : "";
 
 if ($safePlayerId === "" || $timeSeconds < 0) {
     echo json_encode(['status' => 'error', 'message' => 'Invalid score values']);
     exit;
 }
 
-if (!file_exists('scores')) {
-    mkdir('scores', 0777, true);
+function formatScoreTime($seconds) {
+    $safeSeconds = max(0, $seconds);
+    $minutes = floor($safeSeconds / 60);
+    $wholeSeconds = floor($safeSeconds % 60);
+    $hundredths = floor(($safeSeconds - floor($safeSeconds)) * 100);
+
+    return sprintf("%d:%02d.%02d", $minutes, $wholeSeconds, $hundredths);
 }
 
-$scoreEntry = [
-    'playerId' => $safePlayerId,
-    'timeSeconds' => $timeSeconds,
-    'timeFormatted' => $timeFormatted,
-    'candies' => isset($data['candies']) ? intval($data['candies']) : 0,
-    'health' => isset($data['health']) ? intval($data['health']) : 0,
-    'level' => isset($data['level']) ? intval($data['level']) : 5,
-    'completedAt' => date('c')
-];
+$timeFormatted = isset($data['timeFormatted']) ? preg_replace("/[^0-9:.]+/", "", $data['timeFormatted']) : formatScoreTime($timeSeconds);
+$completedAt = date('c');
 
-$scoreLog = 'scores/scores.jsonl';
-$bestScore = 'scores/best_' . $safePlayerId . '.json';
+$db = new SQLite3(__DIR__ . '/game.db');
 
-$saved = file_put_contents($scoreLog, json_encode($scoreEntry) . PHP_EOL, FILE_APPEND | LOCK_EX);
+$db->exec("
+CREATE TABLE IF NOT EXISTS best_times (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    time_seconds REAL NOT NULL,
+    time_formatted TEXT NOT NULL,
+    completed_at TEXT NOT NULL
+)");
 
-if ($saved === false) {
+$db->exec("
+CREATE INDEX IF NOT EXISTS idx_best_times_time
+ON best_times (time_seconds)
+");
+
+$saveStmt = $db->prepare("
+    INSERT INTO best_times (username, time_seconds, time_formatted, completed_at)
+    VALUES (:username, :time_seconds, :time_formatted, :completed_at)
+    ON CONFLICT(username) DO UPDATE SET
+        time_seconds = excluded.time_seconds,
+        time_formatted = excluded.time_formatted,
+        completed_at = excluded.completed_at
+    WHERE excluded.time_seconds < best_times.time_seconds
+");
+
+$saveStmt->bindValue(':username', $safePlayerId, SQLITE3_TEXT);
+$saveStmt->bindValue(':time_seconds', $timeSeconds, SQLITE3_FLOAT);
+$saveStmt->bindValue(':time_formatted', $timeFormatted, SQLITE3_TEXT);
+$saveStmt->bindValue(':completed_at', $completedAt, SQLITE3_TEXT);
+
+$saved = $saveStmt->execute();
+
+if (!$saved) {
     echo json_encode(['status' => 'error', 'message' => 'Could not save score']);
     exit;
 }
 
-$currentBest = null;
+$isNewBest = intval($db->querySingle("SELECT changes()")) > 0;
 
-if (file_exists($bestScore)) {
-    $currentBest = json_decode(file_get_contents($bestScore), true);
-}
+$rankStmt = $db->prepare("
+    SELECT COUNT(*) + 1 AS rank
+    FROM best_times
+    WHERE time_seconds < (
+        SELECT time_seconds
+        FROM best_times
+        WHERE username = :username
+    )
+");
+$rankStmt->bindValue(':username', $safePlayerId, SQLITE3_TEXT);
+$rankResult = $rankStmt->execute();
+$rankRow = $rankResult ? $rankResult->fetchArray(SQLITE3_ASSOC) : ['rank' => null];
 
-if (!$currentBest || !isset($currentBest['timeSeconds']) || $timeSeconds < floatval($currentBest['timeSeconds'])) {
-    file_put_contents($bestScore, json_encode($scoreEntry, JSON_PRETTY_PRINT), LOCK_EX);
-}
+$bestStmt = $db->prepare("
+    SELECT time_seconds, time_formatted
+    FROM best_times
+    WHERE username = :username
+");
+$bestStmt->bindValue(':username', $safePlayerId, SQLITE3_TEXT);
+$bestResult = $bestStmt->execute();
+$bestRow = $bestResult ? $bestResult->fetchArray(SQLITE3_ASSOC) : false;
 
 echo json_encode([
     'status' => 'success',
-    'timeSeconds' => $timeSeconds,
-    'timeFormatted' => $timeFormatted
+    'submittedTimeSeconds' => $timeSeconds,
+    'submittedTimeFormatted' => $timeFormatted,
+    'bestTimeSeconds' => $bestRow ? floatval($bestRow['time_seconds']) : $timeSeconds,
+    'bestTimeFormatted' => $bestRow ? $bestRow['time_formatted'] : $timeFormatted,
+    'newBest' => $isNewBest,
+    'rank' => $rankRow ? $rankRow['rank'] : null
 ]);
 ?>
