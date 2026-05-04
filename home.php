@@ -29,18 +29,15 @@
                     Welcome, <span style="color: aquamarine; border-bottom: none"><?php echo $_SESSION['username'] ?></span>
                 !</span>
             </div>
+            <br>
         <?php } ?>
 
-        <br>
-
-        <div style="display: flex; justify-content: center; align-items: center">
-            <?php 
-                if (isset($_SESSION['username'])) { ?>
-                <a href="index.php" class="button" style="border: 3px solid black">START GAME</a> 
-            <?php } ?>
-        </div>
-
-        <br>
+        <?php if (isset($_SESSION['username'])) { ?>
+            <div style="display: flex; justify-content: center; align-items: center">
+                    <a href="index.php" class="button" style="border: 3px solid black">START GAME</a> 
+            </div>
+            <br>
+        <?php } ?>
 
         <div style="display: flex; justify-content: center; align-items: center">
             <a href="htp.html" class="button" style="border: 3px solid black">HOW TO PLAY</a>
