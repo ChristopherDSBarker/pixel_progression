@@ -51,6 +51,7 @@ let cameraY = 0;
 // LEVEL SYSTEM
 // ------------------
 let nextLevel = 1;
+let level4Built = false;
 
 // ------------------
 // PLAYER
@@ -131,6 +132,12 @@ function loadLevel(level) {
     player.vy = 0;
 
     cameraY = 0; // reset camera
+
+    // Adjust spawn for level 4 (ground platform at y: 480)
+    if (level === 4) {
+        level4Built = false;
+        player.y = 455;
+    }
 
     if (level === 1) {
 
@@ -230,111 +237,197 @@ function loadLevel(level) {
     }
 
     if (level === 4) {
-        obstacles = [
-            { x: 0, y: 480, width: 800, height: 20 },
+        if (!level4Built) {
+            level4Built = true;
 
-            // staggered platforms (force movement)
-            { x: 200, y: 420, width: 100, height: 20 },
-            { x: 500, y: 360, width: 100, height: 20 },
-            { x: 300, y: 300, width: 100, height: 20 }
-        ];
+            obstacles = [];
+            enemies = [];
+            powerups = [];
+            projectiles = [];
 
-        enemies = [
-            {
-                x: 400,
-                y: 455,
+            // ===== ALWAYS HAVE FLOOR =====
+            obstacles.push({ x: 0, y: 480, width: 800, height: 20 });
+
+            // ===== BIG LEVEL 4: LEVEL 1 + LEVEL 2 + LEVEL 3 PLATFORMS =====
+            const platformPlan = [
+                { x: 90,  y: 425, widths: [160, 150, 140] },
+                { x: 220, y: 380, widths: [160, 150, 140] },
+                { x: 345, y: 335, widths: [160, 150, 140] },
+                { x: 470, y: 290, widths: [160, 150, 140] },
+                { x: 575, y: 245, widths: [170, 160, 150] },
+                { x: 490, y: 210, widths: [170, 160, 150] },
+                { x: 405, y: 155, widths: [170, 160, 150] },
+                { x: 320, y: 110, widths: [170, 160, 150] },
+                { x: 235, y: 65,  widths: [170, 160, 150] },
+                { x: 320, y: 20,  widths: [170, 160, 150] },
+                { x: 405, y: -25, widths: [170, 160, 150] },
+                { x: 495, y: -70, widths: [170, 160, 150] },
+                { x: 430, y: -85, widths: [170, 160, 150] },
+                { x: 365, y: -150, widths: [170, 160, 150] },
+                { x: 300, y: -190, widths: [170, 160, 150] },
+                { x: 235, y: -230, widths: [170, 160, 150] },
+                { x: 170, y: -270, widths: [170, 160, 150] },
+                { x: 245, y: -310, widths: [180, 170, 160] }
+            ];
+
+            let pathPlatforms = [];
+
+            for (let i = 0; i < platformPlan.length; i++) {
+                let plan = platformPlan[i];
+                let width = plan.widths[Math.floor(Math.random() * plan.widths.length)];
+                let platform = {
+                    x: plan.x + Math.floor(Math.random() * 13) - 6,
+                    y: plan.y + Math.floor(Math.random() * 7) - 3,
+                    width: width,
+                    height: 20
+                };
+
+                if (platform.x < 20) platform.x = 20;
+                if (platform.x + platform.width > 780) platform.x = 780 - platform.width;
+
+                obstacles.push(platform);
+                pathPlatforms.push(platform);
+            }
+
+            // Level 1/2 horizontal moving platforms as optional bridge/bonus pieces.
+            let movingXBase = pathPlatforms[2];
+            obstacles.push({
+                x: movingXBase.x + 35,
+                y: movingXBase.y - 25,
+                width: 120,
+                height: 20,
+                moving: 'x',
+                minX: movingXBase.x - 20,
+                maxX: movingXBase.x + 180,
+                direction: 1,
+                speed: Math.random() < 0.5 ? 90 : 120
+            });
+
+            movingXBase = pathPlatforms[7];
+            obstacles.push({
+                x: movingXBase.x - 25,
+                y: movingXBase.y - 25,
+                width: 80,
+                height: 20,
+                moving: 'x',
+                minX: movingXBase.x - 80,
+                maxX: movingXBase.x + 120,
+                direction: 1,
+                speed: 90
+            });
+
+            // Level 3 vertical moving platforms as optional lift pieces.
+            let movingYBase = pathPlatforms[5];
+            obstacles.push({
+                x: movingYBase.x - 70,
+                y: movingYBase.y + 35,
+                width: 120,
+                height: 20,
+                moving: 'y',
+                minY: movingYBase.y - 10,
+                maxY: movingYBase.y + 90,
+                direction: 1,
+                speed: 90
+            });
+
+            movingYBase = pathPlatforms[9];
+            obstacles.push({
+                x: movingYBase.x + 80,
+                y: movingYBase.y + 35,
+                width: 120,
+                height: 20,
+                moving: 'y',
+                minY: movingYBase.y - 10,
+                maxY: movingYBase.y + 90,
+                direction: 1,
+                speed: 90
+            });
+
+            // Extra Level 2/3 small platforms, reachable but not required.
+            obstacles.push({
+                x: 20,
+                y: 145 + Math.floor(Math.random() * 11) - 5,
+                width: 50,
+                height: 20
+            });
+
+            obstacles.push({
+                x: 20,
+                y: 95 + Math.floor(Math.random() * 11) - 5,
+                width: 50,
+                height: 20
+            });
+
+            // ===== LEVEL 2 KNIGHT ENEMY =====
+            enemies.push({
+                x: 300,
+                y: 450,
                 width: 20,
                 height: 25,
-                moving: false,
-                direction: -1,
-                speed: 0,
-                damage: 25,
-                right_sprite: enem_marksman_r,
-                left_sprite: enem_marksman_l
-            }
-        ];
+                minX: 200,
+                maxX: 400,
+                moving: true,
+                direction: 1,
+                speed: 50,
+                damage: 15,
+                right_sprite: enem_knight_r,
+                left_sprite: enem_knight_l
+            });
 
-        // CLEAN PROJECTILE SET (no crash, controlled lanes)
-        projectiles = [
-            // LOW LANE (forces jumping)
-            {
-                x: 600,
+            // ===== LEVEL 3 NINJA ENEMY, SOMETIMES =====
+            if (Math.random() < 0.6) {
+                let ninjaPlatform = pathPlatforms[4];
+                enemies.push({
+                    x: ninjaPlatform.x + 20,
+                    y: ninjaPlatform.y - 20,
+                    width: 20,
+                    height: 20,
+                    minX: ninjaPlatform.x,
+                    maxX: ninjaPlatform.x + ninjaPlatform.width - 20,
+                    moving: true,
+                    direction: 1,
+                    speed: 120,
+                    damage: 10,
+                    right_sprite: enem_ninja_r,
+                    left_sprite: enem_ninja_l
+                });
+            }
+
+            // ===== PROJECTILE (SAFE FLOOR PRESSURE) =====
+            projectiles.push({
+                x: 700,
                 y: 455,
                 width: 20,
                 height: 4,
-                minX: canvas.width,
-                maxX: 0,
-                direction: -1,
-                speed: 14,
-                damage: 15,
-                type: 'b',
-                hit: false,
-                right_sprite: enem_bullet_r,
-                left_sprite: enem_bullet_l
-            },
-            // MID LANE (forces positioning)
-            {
-                x: 750,
-                y: 420,
-                width: 20,
-                height: 4,
-                minX: canvas.width,
-                maxX: 0,
                 direction: -1,
                 speed: 10,
-                damage: 15,
+                damage: 10,
                 type: 'b',
                 hit: false,
                 right_sprite: enem_bullet_r,
                 left_sprite: enem_bullet_l
-            },
-            // HIGH LANE (forces staying low sometimes)
-            {
-                x: 500,
-                y: 380,
-                width: 20,
-                height: 4,
-                minX: canvas.width,
-                maxX: 0,
-                direction: -1,
-                speed: 8,
-                damage: 15,
-                type: 'b',
-                hit: false,
-                right_sprite: enem_bullet_r,
-                left_sprite: enem_bullet_l
-            },
-            // FAST CHAOS SHOT (panic bullet)
-            {
-                x: 700,
-                y: 440,
-                width: 20,
-                height: 4,
-                minX: canvas.width,
-                maxX: 0,
-                direction: -1,
-                speed: 20,
-                damage: 20,
-                type: 'b',
-                hit: false,
-                right_sprite: enem_bullet_r,
-                left_sprite: enem_bullet_l
-            }
-        ];
+            });
 
-        powerups = [
-            {
-                x: 380,
-                y: 440,
+            // ===== LEVEL 3 HEART POWERUP =====
+            let powerupPlatform = pathPlatforms[Math.floor(Math.random() * 6) + 4];
+            powerups.push({
+                x: powerupPlatform.x + 20,
+                y: powerupPlatform.y - 45,
                 width: 30,
                 height: 35,
-                type: 's',
-                sprite: p_shield
-            }
-        ];
+                type: 'h',
+                sprite: p_heart
+            });
 
-        // reward is high → encourages mastery
-        star = { x: 350, y: 250, width: 20, height: 20 };
+            // ===== GOAL =====
+            let goalPlatform = pathPlatforms[pathPlatforms.length - 1];
+            star = {
+                x: goalPlatform.x + Math.floor(goalPlatform.width / 2) - 10,
+                y: goalPlatform.y - 35,
+                width: 20,
+                height: 20
+            };
+        }
     }
 }
 
@@ -541,8 +634,8 @@ function updatePhysics(deltaTime) {
         if (pr.type === 'b') {
             pr.x += pr.direction * pr.speed * deltaTime;
             if (pr.x < 0) {
-                pr.x = 400;
-                pr.y = 455;
+                pr.x = pr === projectiles[0] ? 700 : 750;
+                pr.y = pr === projectiles[0] ? 455 : 420;
             }
         }
     }
