@@ -263,7 +263,7 @@ function loadLevel(level) {
                 { x: 405, y: -25, widths: [170, 160, 150] },
                 { x: 495, y: -70, widths: [170, 160, 150] },
                 { x: 430, y: -85, widths: [170, 160, 150] },
-                { x: 365, y: -150, widths: [170, 160, 150] },
+                { x: 365, y: -125, widths: [170, 160, 150] },
                 { x: 300, y: -190, widths: [170, 160, 150] },
                 { x: 235, y: -230, widths: [170, 160, 150] },
                 { x: 170, y: -270, widths: [170, 160, 150] },
@@ -393,20 +393,40 @@ function loadLevel(level) {
                 });
             }
 
-            // ===== PROJECTILE (SAFE FLOOR PRESSURE) =====
-            projectiles.push({
-                x: 700,
-                y: 455,
-                width: 20,
-                height: 4,
-                direction: -1,
-                speed: 10,
-                damage: 10,
-                type: 'b',
-                hit: false,
-                right_sprite: enem_bullet_r,
-                left_sprite: enem_bullet_l
-            });
+            // ===== PROJECTILES (BULLET HELL LANES ACROSS LEVEL 4 HEIGHTS) =====
+            const bulletLanes = [
+                455,
+                365,
+                275,
+                185,
+                95,
+                5,
+                -85,
+                -175,
+                -265,
+                -335
+            ];
+
+            for (let i = 0; i < bulletLanes.length; i++) {
+                let direction = i % 2 === 0 ? -1 : 1;
+                let startX = direction === -1 ? 700 + i * 35 : 80 - i * 25;
+
+                projectiles.push({
+                    x: startX,
+                    y: bulletLanes[i],
+                    startX: startX,
+                    startY: bulletLanes[i],
+                    width: 20,
+                    height: 4,
+                    direction: direction,
+                    speed: 80 + (i % 3) * 15,
+                    damage: 10,
+                    type: 'b',
+                    hit: false,
+                    right_sprite: enem_bullet_r,
+                    left_sprite: enem_bullet_l
+                });
+            }
 
             // ===== LEVEL 3 HEART POWERUP =====
             let powerupPlatform = pathPlatforms[Math.floor(Math.random() * 6) + 4];
@@ -633,9 +653,15 @@ function updatePhysics(deltaTime) {
 
         if (pr.type === 'b') {
             pr.x += pr.direction * pr.speed * deltaTime;
-            if (pr.x < 0) {
-                pr.x = pr === projectiles[0] ? 700 : 750;
-                pr.y = pr === projectiles[0] ? 455 : 420;
+
+            if (pr.direction === -1 && pr.x < -pr.width) {
+                pr.x = pr.startX ?? 700;
+                pr.y = pr.startY ?? pr.y;
+            }
+
+            if (pr.direction === 1 && pr.x > canvas.width + pr.width) {
+                pr.x = pr.startX ?? -pr.width;
+                pr.y = pr.startY ?? pr.y;
             }
         }
     }
