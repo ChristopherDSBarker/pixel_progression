@@ -520,7 +520,11 @@ function loadLevel(level) {
                 health: 120,
                 maxHealth: 120,
                 damage: 25,
-                shootTimer: 0
+                shootTimer: 0,
+                mapTimer: 0,
+                mapWarning: 0,
+                mapAttack: 0,
+                mapHit: false
             };
 
             powerups.push({
@@ -818,14 +822,24 @@ function updatePhysics(deltaTime) {
 
         if (boss.shootTimer > 1.5) {
             boss.shootTimer = 0;
+            let shotX = boss.x + boss.width / 2 - 5;
+            let shotY = boss.y + boss.height;
+            let targetX = player.x + player.width / 2;
+            let targetY = player.y + player.height / 2;
+            let dx = targetX - shotX;
+            let dy = targetY - shotY;
+            let distance = Math.sqrt(dx * dx + dy * dy) || 1;
+            let shotSpeed = 220;
 
             projectiles.push({
-                x: boss.x + boss.width / 2,
-                y: boss.y + boss.height,
+                x: shotX,
+                y: shotY,
                 width: 10,
                 height: 10,
-                direction: player.x < boss.x ? -1 : 1,
-                speed: 200,
+                direction: dx < 0 ? -1 : 1,
+                speed: shotSpeed,
+                vx: dx / distance * shotSpeed,
+                vy: dy / distance * shotSpeed,
                 damage: 15,
                 type: 'boss',
                 hit: false,
@@ -833,6 +847,44 @@ function updatePhysics(deltaTime) {
                 right_sprite: enem_fireball,
                 left_sprite: enem_fireball
             });
+        }
+
+        boss.mapTimer += deltaTime;
+
+        if (boss.mapTimer > 6 && boss.mapWarning <= 0 && boss.mapAttack <= 0) {
+            boss.mapTimer = 0;
+            boss.mapWarning = 1.5;
+            boss.mapHit = false;
+        }
+
+        if (boss.mapWarning > 0) {
+            boss.mapWarning -= deltaTime;
+
+            if (boss.mapWarning <= 0) {
+                boss.mapAttack = 0.9;
+                boss.mapHit = false;
+            }
+        }
+        else if (boss.mapAttack > 0) {
+            boss.mapAttack -= deltaTime;
+
+            if (!boss.mapHit && player.y + player.height > 450 && player.invincible == false) {
+                if (player.shielded) {
+                    player.shielded = false;
+                    sfxShield.play();
+                } else {
+                    player.health -= 25;
+                    sfxHurt.play();
+                }
+
+                boss.mapHit = true;
+                player.invincible = true;
+
+                setTimeout(function() {
+                    player.invincible = false;
+                    }, 2000)
+                updateUI();
+            }
         }
 
         let hasShootPowerup = powerups.some(p => p.type === 'shoot' && p.x > -100);
@@ -906,8 +958,8 @@ function updatePhysics(deltaTime) {
         }
 
         if (pr.type === 'boss') {
-            pr.x += pr.direction * pr.speed * deltaTime;
-            pr.y += pr.speed * 0.25 * deltaTime;
+            pr.x += (pr.vx ?? pr.direction * pr.speed) * deltaTime;
+            pr.y += (pr.vy ?? pr.speed * 0.25) * deltaTime;
 
             if (pr.x < -pr.width || pr.x > canvas.width + pr.width || pr.y > canvas.height + pr.height) {
                 pr.x = -1000;
@@ -1090,6 +1142,15 @@ function drawCanvas() {
         ctx.fillRect(boss.x, bossBarY, boss.width, 8);
         ctx.fillStyle = '#ff3030';
         ctx.fillRect(boss.x, bossBarY, boss.width * (boss.health / boss.maxHealth), 8);
+
+        if (boss.mapWarning > 0) {
+            ctx.fillStyle = 'rgba(255, 230, 0, 0.35)';
+            ctx.fillRect(0, 450, canvas.width, 30);
+        }
+        else if (boss.mapAttack > 0) {
+            ctx.fillStyle = 'rgba(255, 40, 40, 0.65)';
+            ctx.fillRect(0, 450, canvas.width, 30);
+        }
     }
 
     ctx.fillRect(borderL.x, borderL.y, borderL.width, borderL.height);
