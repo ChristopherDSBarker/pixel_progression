@@ -367,6 +367,31 @@ function loadLevel(level) {
                 height: 20
             });
 
+            // Final left-side safety platforms keep the end climb reachable.
+            let safetyBase = pathPlatforms[13];
+            obstacles.push({
+                x: safetyBase.x - 170,
+                y: safetyBase.y - 35,
+                width: 140,
+                height: 20
+            });
+
+            safetyBase = pathPlatforms[14];
+            obstacles.push({
+                x: safetyBase.x - 165,
+                y: safetyBase.y - 20,
+                width: 140,
+                height: 20
+            });
+
+            safetyBase = pathPlatforms[15];
+            obstacles.push({
+                x: safetyBase.x - 160,
+                y: safetyBase.y - 20,
+                width: 140,
+                height: 20
+            });
+
             // ===== LEVEL 2 KNIGHT ENEMY =====
             enemies.push({
                 x: 300,
