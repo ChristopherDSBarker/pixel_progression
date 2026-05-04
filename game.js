@@ -52,6 +52,11 @@ let cameraY = 0;
 // ------------------
 let nextLevel = 1;
 let level4Built = false;
+let level5Initialized = false;
+let boss = null;
+let bossPowerupTimer = 0;
+let bossShotAmmo = 0;
+let shootKeyReady = true;
 
 // ------------------
 // PLAYER
@@ -132,6 +137,10 @@ function loadLevel(level) {
     player.vy = 0;
 
     cameraY = 0; // reset camera
+
+    if (level === 5 && level5Initialized && obstacles.length === 0) {
+        level5Initialized = false;
+    }
 
     // Adjust spawn for level 4 (ground platform at y: 480)
     if (level === 4) {
@@ -449,6 +458,58 @@ function loadLevel(level) {
             };
         }
     }
+
+    if (level === 5) {
+        if (!level5Initialized) {
+            level5Initialized = true;
+
+            obstacles = [];
+            enemies = [];
+            powerups = [];
+            projectiles = [];
+
+            player.y = 455;
+
+            bossPowerupTimer = 0;
+            bossShotAmmo = 0;
+            shootKeyReady = true;
+
+            obstacles = [
+                { x: 0, y: 480, width: 800, height: 20 },
+                { x: 70, y: 430, width: 130, height: 20 },
+                { x: 270, y: 430, width: 130, height: 20 },
+                { x: 165, y: 380, width: 150, height: 20 },
+                { x: 60, y: 330, width: 130, height: 20 },
+                { x: 285, y: 330, width: 130, height: 20 }
+            ];
+
+            boss = {
+                x: 195,
+                y: 70,
+                width: 90,
+                height: 90,
+                minX: 70,
+                maxX: 410,
+                direction: 1,
+                speed: 70,
+                health: 120,
+                maxHealth: 120,
+                damage: 25,
+                shootTimer: 0
+            };
+
+            powerups.push({
+                x: 350,
+                y: 445,
+                width: 30,
+                height: 35,
+                type: 'shoot',
+                sprite: p_shield
+            });
+
+            star = { x: -1000, y: -1000, width: 20, height: 20 };
+        }
+    }
 }
 
 // initial load
@@ -501,8 +562,75 @@ function gameLoop(currentTime) {
 // CAMERA FOLLOW (NEW)
 // ------------------
 function updateCamera() {
+    if (player.level === 5) {
+        cameraY = 0;
+        return;
+    }
+
     let targetY = player.y - (canvas.height / 2 + 85);
     cameraY += (targetY - cameraY) * 0.1;
+}
+
+function shootPlayerProjectile() {
+    projectiles.push({
+        x: player.x + player.width / 2 - 5,
+        y: player.y - 12,
+        width: 10,
+        height: 18,
+        speed: 420,
+        damage: 15,
+        type: 'player',
+        friendly: true,
+        direction: 1,
+        right_sprite: enem_fireball,
+        left_sprite: enem_fireball
+    });
+
+    sfxFireball.currentTime = 0;
+    sfxFireball.play();
+}
+
+function drawScytheBoss(b) {
+    let x = b.x;
+    let y = b.y;
+
+    ctx.save();
+
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(x + 10, y + 82);
+    ctx.lineTo(x + 70, y + 22);
+    ctx.stroke();
+
+    ctx.fillStyle = '#6b432d';
+    ctx.fillRect(x + 66, y + 18, 8, 8);
+    ctx.fillStyle = '#c58c62';
+    ctx.fillRect(x + 68, y + 20, 3, 3);
+
+    ctx.strokeStyle = '#e8e8e8';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(x + 72, y + 48, 32, -0.85, 0.95);
+    ctx.stroke();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(x + 62, y + 48, 25, -0.75, 0.8);
+    ctx.stroke();
+
+    ctx.fillStyle = '#555';
+    ctx.fillRect(x + 22, y - 20, 38, 18);
+    ctx.fillRect(x + 30, y - 2, 8, 12);
+
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(x + 28, y - 14, 8, 8);
+    ctx.fillRect(x + 46, y - 14, 8, 8);
+    ctx.fillStyle = '#999';
+    ctx.fillRect(x + 30, y - 12, 3, 3);
+    ctx.fillRect(x + 48, y - 12, 3, 3);
+
+    ctx.restore();
 }
 
 // ------------------
@@ -520,6 +648,19 @@ function updatePhysics(deltaTime) {
     if (keys['KeyC'] && keys['KeyP']) {
         player.x = star.x;
         player.y = star.y;
+    }
+
+    if (player.level === 5) {
+        if (boss && (keys['KeyX'] || keys['KeyE'])) {
+            if (shootKeyReady && bossShotAmmo > 0) {
+                shootPlayerProjectile();
+                bossShotAmmo--;
+                shootKeyReady = false;
+                updateUI();
+            }
+        } else {
+            shootKeyReady = true;
+        }
     }
 
     player.x += player.vx * deltaTime;
@@ -618,7 +759,81 @@ function updatePhysics(deltaTime) {
         }
     }
 
+    if (player.level === 5 && boss) {
+        boss.x += boss.direction * boss.speed * deltaTime;
+
+        if (boss.x <= boss.minX || boss.x + boss.width >= boss.maxX) {
+            boss.direction *= -1;
+        }
+
+        if (
+            player.x <= boss.x + boss.width &&
+            player.x + player.width >= boss.x &&
+            player.y <= boss.y + boss.height &&
+            player.y + player.height >= boss.y &&
+            player.invincible == false
+        ) {
+            if (player.shielded) {
+                player.shielded = false;
+                sfxShield.play();
+            } else {
+                player.health -= boss.damage;
+                sfxHurt.play();
+            }
+
+            player.invincible = true;
+
+            setTimeout(function() {
+                player.invincible = false;
+                }, 2000)
+            updateUI();
+        }
+
+        boss.shootTimer += deltaTime;
+
+        if (boss.shootTimer > 1.5) {
+            boss.shootTimer = 0;
+
+            projectiles.push({
+                x: boss.x + boss.width / 2,
+                y: boss.y + boss.height,
+                width: 10,
+                height: 10,
+                direction: player.x < boss.x ? -1 : 1,
+                speed: 200,
+                damage: 15,
+                type: 'boss',
+                hit: false,
+                sprite: enem_fireball,
+                right_sprite: enem_fireball,
+                left_sprite: enem_fireball
+            });
+        }
+
+        let hasShootPowerup = powerups.some(p => p.type === 'shoot' && p.x > -100);
+
+        if (bossShotAmmo > 0 || hasShootPowerup) {
+            bossPowerupTimer = 0;
+        } else {
+            bossPowerupTimer += deltaTime;
+
+            if (bossPowerupTimer >= 5) {
+                bossPowerupTimer = 0;
+                powerups.push({
+                    x: 60 + Math.random() * (canvas.width - 120),
+                    y: 445,
+                    width: 30,
+                    height: 35,
+                    type: 'shoot',
+                    sprite: p_shield
+                });
+            }
+        }
+    }
+
     for (let pr of projectiles) {
+        if (pr.friendly) continue;
+
         if (player.x <= pr.x + pr.width &&
             player.x + player.width >= pr.x &&
             player.y <= pr.y + pr.height &&
@@ -662,6 +877,48 @@ function updatePhysics(deltaTime) {
             if (pr.direction === 1 && pr.x > canvas.width + pr.width) {
                 pr.x = pr.startX ?? -pr.width;
                 pr.y = pr.startY ?? pr.y;
+            }
+        }
+
+        if (pr.type === 'boss') {
+            pr.x += pr.direction * pr.speed * deltaTime;
+            pr.y += pr.speed * 0.25 * deltaTime;
+
+            if (pr.x < -pr.width || pr.x > canvas.width + pr.width || pr.y > canvas.height + pr.height) {
+                pr.x = -1000;
+                pr.y = -1000;
+            }
+        }
+
+        if (pr.type === 'player') {
+            pr.y -= pr.speed * deltaTime;
+
+            if (player.level === 5 &&
+                boss &&
+                pr.x < boss.x + boss.width &&
+                pr.x + pr.width > boss.x &&
+                pr.y < boss.y + boss.height &&
+                pr.y + pr.height > boss.y
+            ) {
+                boss.health -= pr.damage;
+                pr.x = -1000;
+                pr.y = -1000;
+                sfxBullet.currentTime = 0;
+                sfxBullet.play();
+                updateUI();
+
+                if (boss.health <= 0) {
+                    boss = null;
+                    projectiles = [];
+                    star = { x: 380, y: 300, width: 20, height: 20 };
+                    updateUI();
+                    return;
+                }
+            }
+
+            if (pr.y < -80) {
+                pr.x = -1000;
+                pr.y = -1000;
             }
         }
     }
@@ -712,6 +969,17 @@ function updatePhysics(deltaTime) {
                 p.x = -1000;
                 p.y = 1000;
                 
+                updateUI();
+            }
+
+            else if (p.type === 'shoot') {
+                bossShotAmmo = 5;
+                bossPowerupTimer = 0;
+                sfxShield.play();
+
+                p.x = -1000;
+                p.y = -1000;
+
                 updateUI();
             }
         }
@@ -788,6 +1056,17 @@ function drawCanvas() {
         ctx.drawImage(sprite, pr.x, pr.y, pr.width, pr.height);
     }
 
+    if (player.level === 5 && boss) {
+        drawScytheBoss(boss);
+
+        let bossBarY = boss.y - 30;
+
+        ctx.fillStyle = '#111';
+        ctx.fillRect(boss.x, bossBarY, boss.width, 8);
+        ctx.fillStyle = '#ff3030';
+        ctx.fillRect(boss.x, bossBarY, boss.width * (boss.health / boss.maxHealth), 8);
+    }
+
     ctx.fillRect(borderL.x, borderL.y, borderL.width, borderL.height);
     ctx.fillRect(borderR.x, borderR.y, borderR.width, borderR.height);
 
@@ -826,6 +1105,9 @@ const storyText = document.getElementById('storyText');
 function updateUI() {
     resourceDisplay.innerText = `Candies: ${candies}`;
     healthDisplay.innerText = `Health: ${player.health}`;
+    if (player.level === 5 && boss) {
+        healthDisplay.innerText = `Health: ${player.health} | Boss: ${Math.max(0, boss.health)} | Shots: ${bossShotAmmo}`;
+    }
     nextlevelButton.addEventListener('click', () => applyUpgrade('none'));
 
     if (gameState === 'MENU') {
