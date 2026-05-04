@@ -10,6 +10,9 @@ let interval = 0;
 
 let candies = 0;
 let timeSinceLastCandy = 0;
+let runStartTime = performance.now();
+let finalRunTime = null;
+let scoreSaved = false;
 
 let musGame = document.getElementById("mus_game");
 musGame.loop = true;
@@ -137,6 +140,13 @@ function loadLevel(level) {
     player.vy = 0;
 
     cameraY = 0; // reset camera
+
+    if (level === 1) {
+        runStartTime = performance.now();
+        finalRunTime = null;
+        scoreSaved = false;
+        document.getElementById('levelStatus').innerText = "Level Complete!";
+    }
 
     if (level === 5 && level5Initialized && obstacles.length === 0) {
         level5Initialized = false;
@@ -1084,6 +1094,12 @@ function updatePhysics(deltaTime) {
     ) {
         sfxWin.play();
 
+        if (player.level === 5) {
+            finishFinalRun();
+        } else {
+            document.getElementById('levelStatus').innerText = "Level Complete!";
+        }
+
         nextLevel = player.level + 1;
         gameState = 'MENU';
         document.getElementById('levelStatus').style.display = 'block';
@@ -1188,6 +1204,46 @@ const upgradeButtons = document.getElementById('upgrade-buttons');
 const nextlevelButton = document.getElementById('next-level-button');
 const storyText = document.getElementById('storyText');
 
+function getRunSeconds() {
+    return (performance.now() - runStartTime) / 1000;
+}
+
+function formatRunTime(totalSeconds) {
+    let safeSeconds = Math.max(0, totalSeconds);
+    let minutes = Math.floor(safeSeconds / 60);
+    let seconds = Math.floor(safeSeconds % 60);
+    let hundredths = Math.floor((safeSeconds - Math.floor(safeSeconds)) * 100);
+
+    return `${minutes}:${String(seconds).padStart(2, '0')}.${String(hundredths).padStart(2, '0')}`;
+}
+
+function finishFinalRun() {
+    if (scoreSaved) return;
+
+    finalRunTime = getRunSeconds();
+    scoreSaved = true;
+
+    let formattedTime = formatRunTime(finalRunTime);
+    document.getElementById('levelStatus').innerText = `Boss defeated! Time: ${formattedTime}`;
+    storyText.innerText = `Final time: ${formattedTime}`;
+    submitScore(finalRunTime, formattedTime);
+}
+
+function submitScore(timeSeconds, timeFormatted) {
+    fetch('score.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            playerId: "student_dev_1",
+            timeSeconds: Number(timeSeconds.toFixed(3)),
+            timeFormatted: timeFormatted,
+            candies: candies,
+            health: player.health,
+            level: player.level
+        })
+    }).catch(error => console.error('Score save failed:', error));
+}
+
 function updateUI() {
     resourceDisplay.innerText = `Candies: ${candies}`;
     healthDisplay.innerText = `Health: ${player.health}`;
@@ -1198,6 +1254,13 @@ function updateUI() {
 
     if (gameState === 'MENU') {
         nextlevelButton.style.display = 'block';
+
+        if (player.level === 5 && finalRunTime !== null) {
+            nextlevelButton.style.display = 'none';
+            upgradeButtons.style.display = 'none';
+            storyText.innerText = `Final time: ${formatRunTime(finalRunTime)}`;
+            return;
+        }
 
         if (!storyText.innerText.includes("merchant")) {
             storyText.innerText = "The candy merchant appears and offers you upgrades...";
