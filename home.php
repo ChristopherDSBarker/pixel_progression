@@ -48,6 +48,20 @@
         <br>
 
         <div style="display: flex; justify-content: center; align-items: center">
+            <a href="leaderboard.php" class="button">LEADERBOARD</a>
+        </div>
+
+        <br>
+
+        <?php if (isset($_SESSION['username'])) { ?>
+            <div style="display: flex; justify-content: center; align-items: center">
+                <a href="my_score.php" class="button">MY BEST TIME</a>
+            </div>
+
+            <br>
+        <?php } ?>
+
+        <div style="display: flex; justify-content: center; align-items: center">
             <?php
             if (isset($_SESSION['username'])) { ?>
                 <a href="logout.php" id="signout" class="button">LOG OUT</a>
