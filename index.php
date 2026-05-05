@@ -18,7 +18,7 @@
 <body id="indexBody">
 
 <div id="game-container">
-    <h2 id="levelStatus" style="display: none;">Level Complete!</h2>
+    <h2 id="levelStatus" style="display: none; color: green">Level Complete!</h2>
     <canvas id="gameCanvas" width="480" height="500"></canvas>
 
     <div id="ui-panel">
@@ -26,7 +26,7 @@
         <p id="resourceDisplay">Candies: 0</p>
         <p id="healthDisplay">Health: 100</p>
 
-        <p id="storyText"></p>
+        <p id="storyText" style="color: aquamarine"></p>
 
         <br>
         
@@ -107,7 +107,7 @@
 <audio id="sfx_upgrade" src="assets/sfx_upgrade.mp3" preload="auto"></audio>
 <audio id="sfx_comeagain" src="assets/sfx_merchant2.mp3" preload="auto"></audio>
 <audio id="sfx_broke" src="assets/sfx_btn_fail.mp3" preload="auto"></audio>
-        <?php             
+        <?php
             $username = $_SESSION['username'];
             $statsdb = new SQLite3("login.db");
             $query = "SELECT * FROM STATS WHERE L_USERNAME = '$username'";
@@ -120,6 +120,7 @@
                 $speed = $row['S_SPEED'];
                 $health = $row['S_HEALTH'];
                 $candies = $row['S_CANDIES'];
+                $seconds = $row['S_SECONDS'];
                 ?>
                 <script src="game.js">
                 </script>
@@ -129,6 +130,7 @@
                     player.speed = <?php echo $speed; ?>;
                     player.health = <?php echo $health; ?>;
                     candies = <?php echo $candies; ?>;
+                    seconds = <?php echo $seconds; ?>;
                     loadLevel(player.level);
                     startGame();
                 </script>

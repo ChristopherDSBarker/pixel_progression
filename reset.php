@@ -13,7 +13,7 @@
     $row = $success->fetchArray(SQLITE3_ASSOC);
     if ($row) {
         $update = "UPDATE STATS SET S_LEVEL = '1', S_JUMPHEIGHT = '300', S_SPEED = '150',
-            S_HEALTH = '100', S_CANDIES = '0' WHERE L_USERNAME = '$username'";
+            S_HEALTH = '100', S_CANDIES = '0', S_SECONDS = '0' WHERE L_USERNAME = '$username'";
         $statsdb->exec($update);
         header("Location: index.php");
         exit();

@@ -9,8 +9,7 @@
 
 	<body style="background-color: teal; border: 10px double black; padding: 15px">
 
-        <audio id="sfx_hover" src="sfx_btn_hover.mp3" preload="auto"></audio>
-        <audio id="sfx_click" src="sfx_btn_click.mp3" preload="auto"></audio>
+        <audio id="sfx_hover" src="assets/sfx_btn_hover.mp3" preload="auto"></audio>
 
         <h1>
             <u style="color: rgb(255, 255, 135); text-shadow: 2px 2px 2px black">
@@ -46,6 +45,19 @@
         <br>
 
         <div style="display: flex; justify-content: center; align-items: center">
+            <a href="leaderboard.php" class="button" style="border: 3px solid black">LEADERBOARD</a>
+        </div>
+
+        <br>
+
+        <?php if (isset($_SESSION['username'])) { ?>
+            <div style="display: flex; justify-content: center; align-items: center">
+                <a href="my_score.php" class="button" style="border: 3px solid black">MY BEST TIME</a>
+            </div>
+            <br>
+        <?php } ?>
+
+        <div style="display: flex; justify-content: center; align-items: center">
             <?php
             if (isset($_SESSION['username'])) { ?>
                 <a href="logout.php" id="signout" class="button" style="border: 3px solid black">LOG OUT</a>
@@ -54,17 +66,24 @@
             <?php } ?>
         </div>
 
-        <br><br>
+        <br>
 
-        <div style="display: flex; justify-content: center; align-items: center">
-            <img src="conceptlogo.png"/>
-        </div>
+
+        <?php
+        //DISPLAYS THIS MESSAGE AFTER LOGGING IN>
+        if (!isset($_SESSION['username'])) { ?>
+            <div style="display: flex; justify-content: center; align-items: center">
+                <img src="conceptlogo.png"/>
+            </div>
+        <?php } ?>
 
         <script>
 
             let playButton = document.getElementsByClassName("button")[0];
             let logButton = document.getElementsByClassName("button")[1];
             let htpButton = document.getElementsByClassName("button")[2];
+            let leaderButton = document.getElementsByClassName("button")[3];
+            let bestButton = document.getElementsByClassName("button")[4];
 
             let sfxHover = document.getElementById("sfx_hover");
             let sfxClick = document.getElementById("sfx_click");
@@ -97,6 +116,26 @@
 
             htpButton.addEventListener("mouseout", function() {
                 htpButton.style.backgroundColor = "aquamarine";
+            });
+
+            leaderButton.addEventListener("mouseover", function() {
+                leaderButton.style.backgroundColor = "rgb(255, 255, 135)";
+                sfxHover.currentTime = 0;
+                sfxHover.play();
+            });
+
+            leaderButton.addEventListener("mouseout", function() {
+                leaderButton.style.backgroundColor = "aquamarine";
+            });
+
+            bestButton.addEventListener("mouseover", function() {
+                bestButton.style.backgroundColor = "rgb(255, 255, 135)";
+                sfxHover.currentTime = 0;
+                sfxHover.play();
+            });
+
+            bestButton.addEventListener("mouseout", function() {
+                bestButton.style.backgroundColor = "aquamarine";
             });
             
 
