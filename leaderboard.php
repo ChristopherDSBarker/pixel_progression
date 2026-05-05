@@ -78,6 +78,9 @@ $results = $db->query("
     </style>
 </head>
 <body>
+
+    <audio id="sfx_hover" src="assets/sfx_btn_hover.mp3" preload="auto"></audio>
+    
     <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
         <h1 id="title1">P i x e l</h1>
         <h1 id="title2"> P r o g r e s s i o n </h1>
@@ -128,5 +131,21 @@ $results = $db->query("
             <?php } ?>
         </div>
     </main>
-</body>
+
+        <script>
+            let buttons = document.querySelectorAll(".button");
+            let sfxHover = document.getElementById("sfx_hover");
+
+            buttons.forEach(b => {
+                b.addEventListener("mouseover", function() {
+                    b.style.backgroundColor = "rgb(255, 255, 135)";
+                    sfxHover.currentTime = 0;
+                    sfxHover.play();
+                });
+                b.addEventListener("mouseout", function() {
+                    b.style.backgroundColor = "aquamarine";
+                });
+            });
+        </script>
+    </body>
 </html>

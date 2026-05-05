@@ -21,11 +21,13 @@ body {
     padding: 6px 10px;
     margin: 5px;
     cursor: pointer;
+    font-family: monospace;
 }
 
 .ui-button:hover {
     background: white;
     color: black;
+    font-family: monospace;
 }
 
 .menu-button {

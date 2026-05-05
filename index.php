@@ -84,6 +84,7 @@ if (!isset($_SESSION['username'])) {
 
 <audio id="mus_game" src="assets/mus_game.ogg" preload="auto"></audio>
 <audio id="mus_gameover" src="assets/mus_gameover.ogg" preload="auto"></audio>
+<audio id="mus_boss" src="assets/mus_boss.ogg" preload="auto"></audio>
 
 <audio id="sfx_jump" src="assets/sfx_player_jump.mp3" preload="auto"></audio>
 <audio id="sfx_hurt" src="assets/sfx_player_hurt.mp3" preload="auto"></audio>

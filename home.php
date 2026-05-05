@@ -10,10 +10,15 @@
 	<body style="background-color: teal">
 
         <audio id="sfx_hover" src="assets/sfx_btn_hover.mp3" preload="auto"></audio>
+        
+        <?php 
+        if (isset($_SESSION['username'])) { ?>
+            <img src="conceptlogo.png" style="display: none"></img>
+        <?php } else { ?>
+            <img src="conceptlogo.png" style="display: inline"></img>
+        <?php } ?>
 
         <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
-            <img src="conceptlogo.png"></img>
-            
             <h1 id="title1">P i x e l</h1>
             <h1 id="title2"> P r o g r e s s i o n </h1>
         </div>

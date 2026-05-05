@@ -14,16 +14,17 @@ let runStartTime = performance.now();
 let finalRunTime = null;
 let scoreSaved = false;
 
-let musGame = document.getElementById("mus_game");
-musGame.loop = true;
-
 // ------------------
 // MUSIC SETUP
 // ------------------
 
-if (gameState === 'PLAYING') {
-    musGame.play();
-}
+let musGame = document.getElementById("mus_game");
+musGame.loop = true;
+musGame.play();
+
+let musBoss = document.getElementById("mus_boss");
+musBoss.loop = true;
+
 
 const sfxJump = document.getElementById("sfx_jump");
 const sfxHurt = document.getElementById("sfx_hurt");
@@ -502,6 +503,10 @@ function loadLevel(level) {
             enemies = [];
             powerups = [];
             projectiles = [];
+
+            musGame.pause();
+            musBoss.play();
+            musBoss.loop = true;
 
             player.y = 455;
 
