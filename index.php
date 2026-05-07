@@ -81,6 +81,7 @@ if (!isset($_SESSION['username'])) {
 
 <img id="p_heart" src="assets/powerup_heart.png" style="display: none">
 <img id="p_shield" src="assets/powerup_shield.png" style="display: none">
+<img id="p_hat" src="assets/powerup_hat.png" style="display: none">
 
 <audio id="mus_game" src="assets/mus_game.ogg" preload="auto"></audio>
 <audio id="mus_gameover" src="assets/mus_gameover.ogg" preload="auto"></audio>
@@ -102,6 +103,7 @@ if (!isset($_SESSION['username'])) {
 <audio id="sfx_heart" src="assets/sfx_powerup_health.mp3" preload="auto"></audio>
 <audio id="sfx_heartf" src="assets/sfx_powerup_healthfull.mp3" preload="auto"></audio>
 <audio id="sfx_shield" src="assets/sfx_powerup_shield.mp3" preload="auto"></audio>
+<audio id="sfx_hat" src="assets/sfx_powerup_hat.mp3" preload="auto"></audio>
 
 <audio id="sfx_hey" src="assets/sfx_merchant.mp3" preload="auto"></audio>
 <audio id="sfx_upgrade" src="assets/sfx_upgrade.mp3" preload="auto"></audio>

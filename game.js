@@ -42,6 +42,7 @@ const sfxHover = document.getElementById("sfx_hover");
 const sfxHealth = document.getElementById("sfx_heart");
 const sfxHealthF = document.getElementById("sfx_heartf");
 const sfxShield = document.getElementById("sfx_shield");
+const sfxHat = document.getElementById("sfx_hat");
 
 const sfxMerchant1 = document.getElementById("sfx_hey");
 const sfxUpgrade = document.getElementById("sfx_upgrade");
@@ -100,6 +101,7 @@ let projectiles = [];
 
 const p_heart = document.getElementById("p_heart");
 const p_shield = document.getElementById("p_shield");
+const p_hat = document.getElementById("p_hat");
 
 const enem_knight_r = document.getElementById("e_knight_r");
 const enem_knight_l = document.getElementById("e_knight_l");
@@ -554,7 +556,7 @@ function loadLevel(level) {
                 width: 30,
                 height: 35,
                 type: 'shoot',
-                sprite: p_shield
+                sprite: p_hat
             });
 
             star = { x: -1000, y: -1000, width: 20, height: 20 };
@@ -930,7 +932,7 @@ function updatePhysics(deltaTime) {
                     width: 30,
                     height: 35,
                     type: 'shoot',
-                    sprite: p_shield
+                    sprite: p_hat
                 });
             }
         }
@@ -1087,7 +1089,7 @@ function updatePhysics(deltaTime) {
             else if (p.type === 'shoot') {
                 bossShotAmmo = 5;
                 bossPowerupTimer = 0;
-                sfxShield.play();
+                sfxHat.play();
 
                 p.x = -1000;
                 p.y = -1000;
@@ -1218,6 +1220,8 @@ function drawCanvas() {
         ctx.fillRect(player.x, player.y, player.width, player.height);
         ctx.globalAlpha = 1;
     }
+
+    if (bossShotAmmo > 0) ctx.drawImage(p_hat, player.x - 5, player.y - 30, 30, 32);
     ctx.restore();
 }
 
