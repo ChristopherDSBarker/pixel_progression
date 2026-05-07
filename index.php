@@ -85,11 +85,15 @@ if (!isset($_SESSION['username'])) {
 <audio id="mus_game" src="assets/mus_game.ogg" preload="auto"></audio>
 <audio id="mus_gameover" src="assets/mus_gameover.ogg" preload="auto"></audio>
 <audio id="mus_boss" src="assets/mus_boss.ogg" preload="auto"></audio>
+<audio id="mus_won" src="assets/mus_gamewon.ogg" preload="auto"></audio>
 
 <audio id="sfx_jump" src="assets/sfx_player_jump.mp3" preload="auto"></audio>
 <audio id="sfx_hurt" src="assets/sfx_player_hurt.mp3" preload="auto"></audio>
 <audio id="sfx_fireball" src="assets/sfx_wizard_projectile.mp3" preload="auto"></audio>
 <audio id="sfx_bullet" src="assets/sfx_marksman_projectile.mp3" preload="auto"></audio>
+
+<audio id="sfx_bfireball" src="assets/sfx_boss_fireball.mp3" preload="auto"></audio>
+<audio id="sfx_firego" src="assets/sfx_fireattack.mp3" preload="auto"></audio>
 
 <audio id="sfx_win" src="assets/sfx_levelcomplete.mp3" preload="auto"></audio>
 <audio id="sfx_over" src="assets/sfx_gameover.mp3" preload="auto"></audio>

@@ -25,11 +25,15 @@ musGame.play();
 let musBoss = document.getElementById("mus_boss");
 musBoss.loop = true;
 
+let musWon = document.getElementById("mus_won");
 
 const sfxJump = document.getElementById("sfx_jump");
 const sfxHurt = document.getElementById("sfx_hurt");
 const sfxFireball = document.getElementById("sfx_fireball");
 const sfxBullet = document.getElementById("sfx_bullet");
+
+const sfxBossFireball = document.getElementById("sfx_bfireball");
+const sfxBossFireGo = document.getElementById("sfx_firego");
 
 const sfxWin = document.getElementById("sfx_win");
 const sfxOver = document.getElementById("sfx_over");
@@ -43,6 +47,8 @@ const sfxMerchant1 = document.getElementById("sfx_hey");
 const sfxUpgrade = document.getElementById("sfx_upgrade");
 const sfxMerchant2 = document.getElementById("sfx_comeagain");
 const sfxBroke = document.getElementById("sfx_broke");
+
+
 
 const musGameOver = document.getElementById("mus_gameover");
 
@@ -532,8 +538,8 @@ function loadLevel(level) {
                 maxX: 410,
                 direction: 1,
                 speed: 70,
-                health: 120,
-                maxHealth: 120,
+                health: 750,
+                maxHealth: 750,
                 damage: 25,
                 shootTimer: 0,
                 mapTimer: 0,
@@ -836,6 +842,7 @@ function updatePhysics(deltaTime) {
         boss.shootTimer += deltaTime;
 
         if (boss.shootTimer > 1.5) {
+
             boss.shootTimer = 0;
             let shotX = boss.x + boss.width / 2 - 5;
             let shotY = boss.y + boss.height;
@@ -862,11 +869,17 @@ function updatePhysics(deltaTime) {
                 right_sprite: enem_fireball,
                 left_sprite: enem_fireball
             });
+
+            sfxBossFireball.currentTime = 0;
+            sfxBossFireball.play();
         }
 
         boss.mapTimer += deltaTime;
 
         if (boss.mapTimer > 6 && boss.mapWarning <= 0 && boss.mapAttack <= 0) {
+            sfxBossFireGo.currentTime = 0;
+            sfxBossFireGo.play();
+
             boss.mapTimer = 0;
             boss.mapWarning = 1.5;
             boss.mapHit = false;
@@ -1000,6 +1013,13 @@ function updatePhysics(deltaTime) {
                 updateUI();
 
                 if (boss.health <= 0) {
+                    document.querySelectorAll("audio").forEach(audio => {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    });
+
+                    sfxOver.play();
+
                     boss = null;
                     projectiles = [];
                     star = { x: 380, y: 300, width: 20, height: 20 };
@@ -1169,6 +1189,7 @@ function drawCanvas() {
             ctx.fillRect(0, 450, canvas.width, 30);
         }
         else if (boss.mapAttack > 0) {
+            
             ctx.fillStyle = 'rgba(255, 40, 40, 0.65)';
             ctx.fillRect(0, 450, canvas.width, 30);
         }
@@ -1225,6 +1246,8 @@ function formatRunTime(totalSeconds) {
 function finishFinalRun() {
     if (scoreSaved) return;
 
+    musWon.play();
+
     finalRunTime = getRunSeconds();
     scoreSaved = true;
 
@@ -1253,7 +1276,7 @@ function updateUI() {
     resourceDisplay.innerText = `Candies: ${candies}`;
     healthDisplay.innerText = `Health: ${player.health}`;
     if (player.level === 5 && boss) {
-        healthDisplay.innerText = `Health: ${player.health} | Boss: ${Math.max(0, boss.health)} | Shots: ${bossShotAmmo}`;
+        healthDisplay.innerText = `Health: ${player.health} | Boss: ${Math.max(0, boss.health)} | Shots: ${bossShotAmmo} | Press X or E to shoot!`;
     }
     nextlevelButton.addEventListener('click', () => applyUpgrade('none'));
 
@@ -1268,7 +1291,8 @@ function updateUI() {
         }
 
         if (!storyText.innerText.includes("merchant")) {
-            storyText.innerText = "The candy merchant appears and offers you upgrades...";
+            if (player.level <= 3) storyText.innerText = "The candy merchant appears and offers you upgrades...";
+            else storyText.innerText = "You feel a dangerous presence...choose your next upgrade wisely.";
             sfxMerchant1.play();
 
             upgradeButtons.style.display = 'block';
