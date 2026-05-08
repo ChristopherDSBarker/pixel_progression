@@ -1,11 +1,21 @@
-<<<<<<< HEAD
-# design.css is for different styles of borders and such
-# login.db is all the log in information, LOGININFO with L_PASSWORD and L_USERNAME
-# home.php is a temporary home page for TESTING ONLY
-# login.php is the log in page that connects to login.db and logs the user in if an account matches
-# register.php is to create an account in login.db
-# conceptlogo.png is a TEMPORARY logo until further approved
-=======
-project/ │ ├── home.php (website's home page) ├── design_home.css (basic styling) ├── htp.html (how to play screen) ├── sfx_btn_hover.mp3 (sound effect for hovering over a button)
+# CSCI367 Project
 
->>>>>>> fd508627dfcc90ff84bd83f1aa08dd10e87fc6f0
+## Features
+- Login and registration system
+- Leaderboard support
+- Save/load system
+- Boss music and sound effects
+- Home and how-to-play screens
+
+## Main Files
+- home.php — website home page
+- login.php — user authentication
+- register.php — account creation
+- game.js — gameplay logic
+- htp.html — how to play screen
+- style.css — game styling
+
+## Assets
+- sfx_btn_hover.mp3 — button hover SFX
+- mus_boss.ogg — boss music
+- mus_gamewon.ogg — victory music
