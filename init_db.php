@@ -1,4 +1,24 @@
-<?php
+<?php //init save and login info databases, run once to create tables, can be deleted after
+$db = new SQLite3(__DIR__ . '/login.db');
+
+$db->exec("
+CREATE TABLE LOGININFO (
+    L_USERNAME TEXT PRIMARY KEY,
+    L_PASSWORD TEXT
+)");
+
+$db->exec("
+CREATE TABLE STATS (
+    L_USERNAME TEXT PRIMARY KEY,
+    S_LEVEL,
+    S_JUMPHEIGHT,
+    S_SPEED,
+    S_HEALTH,
+    S_CANDIES,
+    S_SECONDS,
+    FOREIGN KEY (L_USERNAME) REFERENCES LOGININFO(L_USERNAME)
+);");
+
 $db = new SQLite3(__DIR__ . '/game.db');
 
 $db->exec("

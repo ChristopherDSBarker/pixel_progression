@@ -8,14 +8,14 @@
 - Home and how-to-play screens
 
 ## Main Files
-- home.php — website home page
-- login.php — user authentication
-- register.php — account creation
-- game.js — gameplay logic
-- htp.html — how to play screen
-- style.css — game styling
+- home.php - website home page
+- login.php - user authentication
+- register.php - account creation
+- game.js - gameplay logic
+- htp.html - how to play screen
+- style.css - game styling
 
 ## Assets
-- sfx_btn_hover.mp3 — button hover SFX
-- mus_boss.ogg — boss music
-- mus_gamewon.ogg — victory music
+- sfx_btn_hover.mp3 - button hover SFX
+- mus_boss.ogg - boss music
+- mus_gamewon.ogg - victory music
