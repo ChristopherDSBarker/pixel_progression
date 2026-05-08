@@ -1,10 +1,11 @@
 h1 {
-    position: relative;
-    
-    padding-top: 10px;
+    border: 5px black ridge;
+    padding: 15px;
     text-align: center;
+    background-color: aquamarine;
     font-family: monospace;
-    font-size: 40px;
+    box-shadow: 3px 3px 3px black;
+    font-size: 45;
 }
 
 h2 {
@@ -14,10 +15,10 @@ h2 {
     text-align: center;
 
     font-family: monospace;
-    font-size: 40px;
+    font-size: 35;
 
     color: rgb(255, 255, 135);
-    text-shadow: -2px 0px 0 black;
+    text-shadow: 2px 2px 2px black;
 }
 
 table {
@@ -27,26 +28,23 @@ table {
 }
 
 img {
-    position: absolute;
-    top: 70%;
-    left: 44.3%;
-    
-    border: 5px ridge black;
-    padding: 5px;
-    width: 10%;
+    border: 8px ridge white;
+    padding: 2px;
+    width: 100px;
     background-color: mediumseagreen;
-    opacity: 65%;
+    box-shadow: 3px 3px 3px black;
 }
 
 #title1 {
-    color: rgb(255, 255, 135);
-    text-shadow: -2px 0px 0 black;
+    color: rgb(255, 255, 135); 
+    border-bottom: none; 
+    text-shadow: 2px 2px 2px black;
 }
 
 #title2 {
-    padding-top: 1px;
-    color: skyblue;
-    text-shadow: -2px 0px 0 black;
+    color: skyblue; 
+    border-bottom: none; 
+    text-shadow: 2px 2px 2px black;
 }
 
 .button {

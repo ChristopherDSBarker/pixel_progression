@@ -1,11 +1,11 @@
-<?php
-session_start();
+            <?php
+            session_start();
 
-if (!isset($_SESSION['username'])) {
-    header("Location: home.php");
-    exit();
-}
-?>
+            if (!isset($_SESSION['username'])) {
+                header("Location: home.php");
+                exit();
+            }
+            ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,31 +13,33 @@ if (!isset($_SESSION['username'])) {
     <meta charset="UTF-8">
     <title>Pixel Progression</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="conceptlogo.png">
 </head>
 <body id="indexBody">
 
 <div id="game-container">
+    <h2 id="levelStatus" style="display: none; color: green">Level Complete!</h2>
     <canvas id="gameCanvas" width="480" height="500"></canvas>
 
     <div id="ui-panel">
-        <h2 id="levelStatus" style="display: none;">Level Complete!</h2>
 
         <p id="resourceDisplay">Candies: 0</p>
         <p id="healthDisplay">Health: 100</p>
 
-        <div id="next-level-button" style="display: none;">
-            <button id="btnNextLevel" class="ui-button">Keep going!</button>
-        </div>
+        <p id="storyText" style="color: aquamarine"></p>
 
         <br>
         
         <div id="upgrade-buttons" style="display: none;">
-            <button id="btnUpgradeHealth" class="ui-button">Increase Max Health (15 Candies)</button>
-            <button id="btnUpgradeJump" class="ui-button">Increase Jump Height (20 Candies)</button>
-            <button id="btnUpgradeSpeed" class="ui-button">Increase Speed (10 Candies)</button>
+            <button id="btnUpgradeHealth" class="ui-button" style="background-color: salmon">Increase Max Health (15 Candies)</button>
+            <button id="btnUpgradeJump" class="ui-button" style="background-color: rgb(255, 255, 135)">Increase Jump Height (20 Candies)</button>
+            <button id="btnUpgradeSpeed" class="ui-button" style="background-color: mediumseagreen">Increase Speed (10 Candies)</button>
+            <button id="btnNextLevel" class="ui-button">Keep going!</button>
         </div>
 
-        <p id="storyText"></p>
+        <br>
+
+        <p id="poor" style="display: none">You do not have enough candies to get that ability!</p>
 
         <h1 id="overText" 
             style="
@@ -45,9 +47,8 @@ if (!isset($_SESSION['username'])) {
             font-size: 50px; 
             display: none
             ">
-            GAME <span style="color: red">OVER</span></h1>
-
-        <br>
+            GAME <span style="color: red">OVER</span>
+        </h1>
         
         <div id="retry" style="display: none; justify-content: center; align-items: center">
             <a href="index.php" class="menu-button">RETRY?</a> 
@@ -59,10 +60,15 @@ if (!isset($_SESSION['username'])) {
             <a href="home.php" class="menu-button">RETURN HOME</a> 
         </div>
 
-        <!-- optional logout -->
         <br>
-        <a id="return" href="home.php">Home</a>
-        <a id="logout" href="logout.php">Logout</a>
+        <!-- optional logout -->
+        <!-- <a id="return" href="home.php">
+            <button style="background-color: aquamarine; border: 2px solid black; font-family: monospace">Home</button>
+        </a> -->
+        <button id="return" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="home()">Home</button>
+        <button id="leaderboard" style="background-color: aquamarine; border: 2px solid black; font-family: monospace; display: none" onclick="leaderboard()">Leaderboards</button>
+        <button id="logout" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="logoutAndSave()">Log out</button>
+        <button id="reset" style="background-color: aquamarine; border: 2px solid black; font-family: monospace" onclick="reset()">Reset?</button>
     </div>
 </div>
 
@@ -109,7 +115,46 @@ if (!isset($_SESSION['username'])) {
 <audio id="sfx_upgrade" src="assets/sfx_upgrade.mp3" preload="auto"></audio>
 <audio id="sfx_comeagain" src="assets/sfx_merchant2.mp3" preload="auto"></audio>
 <audio id="sfx_broke" src="assets/sfx_btn_fail.mp3" preload="auto"></audio>
+        <?php // runs for profile stuff or save data, checks if user has stats saved and loads them if so, otherwise starts new game with default values
+            $username = $_SESSION['username'];
+            $statsdb = new SQLite3("login.db");
+            $query = "SELECT * FROM STATS WHERE L_USERNAME = '$username'";
+            $success = $statsdb->query($query);
 
-<script src="game.js"></script>
+            $row = $success->fetchArray(SQLITE3_ASSOC);
+            if ($row) {
+                $level = $row['S_LEVEL'];
+                $jumpheight = $row['S_JUMPHEIGHT'];
+                $speed = $row['S_SPEED'];
+                $health = $row['S_HEALTH'];
+                $candies = $row['S_CANDIES'];
+                $seconds = $row['S_SECONDS'];
+                ?>
+                <script src="game.js">
+                </script>
+                <script>
+                    player.level = <?php echo $level; ?>;
+                    player.jumpHeight = <?php echo $jumpheight; ?>;
+                    player.speed = <?php echo $speed; ?>;
+                    player.health = <?php echo $health; ?>;
+                    candies = <?php echo $candies; ?>;
+                    secondsS = <?php echo $seconds; ?>;
+                    loadLevel(player.level);
+                    startGame();
+                    console.log(secondsS);
+                </script>
+                <?php
+            } else {
+                ?>
+                <script src="game.js">
+                </script>
+                <script>
+                    loadLevel(1);
+                    startGame();
+                </script>
+                <?php
+            }
+            
+        ?>
 </body>
 </html>

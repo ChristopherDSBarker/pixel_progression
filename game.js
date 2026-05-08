@@ -7,7 +7,10 @@ const ctx = canvas.getContext('2d');
 let gameState = 'PLAYING';
 let lastTime = performance.now();
 let interval = 0;
-
+//added variables for seconds, candies, and score saving
+let currSec = 0;
+let secondsS = 0;
+let totalSec = 0;
 let candies = 0;
 let timeSinceLastCandy = 0;
 let runStartTime = performance.now();
@@ -152,6 +155,7 @@ function loadLevel(level) {
 
     if (level === 1) {
         runStartTime = performance.now();
+        secondsS = 0;
         finalRunTime = null;
         scoreSaved = false;
         document.getElementById('levelStatus').innerText = "Level Complete!";
@@ -564,9 +568,6 @@ function loadLevel(level) {
     }
 }
 
-// initial load
-loadLevel(1);
-
 // ------------------
 // INPUT
 // ------------------
@@ -585,9 +586,17 @@ document.addEventListener('keyup', e => keys[e.code] = false);
 // LOOP (MINIMAL CHANGE)
 // ------------------
 function gameLoop(currentTime) {
+    resourceDisplay.innerText = `Candies: ${candies}`;
+    if (player.level === 5 && boss) {
+        healthDisplay.innerText = `Health: ${player.health} | Boss: ${Math.max(0, boss.health)} | Shots: ${bossShotAmmo} | Press X or E to shoot!`;
+    } else {
+        healthDisplay.innerText = `Health: ${player.health}`;
+    }
     let deltaTime = (currentTime - lastTime) / 1000;
     if (deltaTime > 0.1) deltaTime = 0.1;
     lastTime = currentTime;
+    currSec = getRunSeconds(); //added to get current seconds for score saving
+
 
     if (gameState === 'PLAYING') {
         timeSinceLastCandy += deltaTime;
@@ -1231,7 +1240,6 @@ function drawCanvas() {
 const resourceDisplay = document.getElementById('resourceDisplay');
 const healthDisplay = document.getElementById('healthDisplay');
 const upgradeButtons = document.getElementById('upgrade-buttons');
-const nextlevelButton = document.getElementById('next-level-button');
 const storyText = document.getElementById('storyText');
 
 function getRunSeconds() {
@@ -1249,15 +1257,15 @@ function formatRunTime(totalSeconds) {
 
 function finishFinalRun() {
     if (scoreSaved) return;
-
-    musWon.play();
-
-    finalRunTime = getRunSeconds();
+    //added finalRunTime calculation and score saving logic here, triggered upon defeating the boss and touching the star in level 5
+    finalRunTime = currSec + secondsS;
     scoreSaved = true;
 
     let formattedTime = formatRunTime(finalRunTime);
     document.getElementById('levelStatus').innerText = `Boss defeated! Time: ${formattedTime}`;
-    storyText.innerText = `Final time: ${formattedTime}`;
+    // storyText.innerText = `Final time: ${formattedTime}`;
+    storyText.innerText = "Congratulations! You have defeated the candy scythe!";
+    document.getElementById('leaderboard').style = "background-color: aquamarine; border: 2px solid black; font-family: monospace; display: show";
     submitScore(finalRunTime, formattedTime);
 }
 
@@ -1282,15 +1290,13 @@ function updateUI() {
     if (player.level === 5 && boss) {
         healthDisplay.innerText = `Health: ${player.health} | Boss: ${Math.max(0, boss.health)} | Shots: ${bossShotAmmo} | Press X or E to shoot!`;
     }
-    nextlevelButton.addEventListener('click', () => applyUpgrade('none'));
 
     if (gameState === 'MENU') {
-        nextlevelButton.style.display = 'block';
 
         if (player.level === 5 && finalRunTime !== null) {
-            nextlevelButton.style.display = 'none';
             upgradeButtons.style.display = 'none';
-            storyText.innerText = `Final time: ${formatRunTime(finalRunTime)}`;
+            // storyText.innerText = `Final time: ${formatRunTime(finalRunTime)}`;
+            storyText.innerText = "Congratulations! You have defeated the candy scythe!";
             return;
         }
 
@@ -1312,6 +1318,8 @@ function updateUI() {
         homeBtn.style.display = 'none';
         let logoutBtn = document.getElementById("logout");
         logoutBtn.style.display = 'none';
+        let resetBtn = document.getElementById("reset");
+        resetBtn.style.display = 'none';
 
         gameOver();
     }
@@ -1323,10 +1331,10 @@ function updateUI() {
 document.getElementById('btnUpgradeHealth').addEventListener('click', () => applyUpgrade('health'));
 document.getElementById('btnUpgradeJump').addEventListener('click', () => applyUpgrade('jump'));
 document.getElementById('btnUpgradeSpeed').addEventListener('click', () => applyUpgrade('speed'));
+document.getElementById('btnNextLevel').addEventListener('click', () => applyUpgrade('none'));
 
 function applyUpgrade(type) {
     if (type === 'none') {
-        nextlevelButton.style.display = 'none'; 
         upgradeButtons.style.display = 'none';
         
         player.level = nextLevel;
@@ -1379,7 +1387,6 @@ function applyUpgrade(type) {
         sfxUpgrade.play();
         sfxMerchant2.play();
 
-        nextlevelButton.style.display = 'none'; 
         upgradeButtons.style.display = 'none';
 
         player.level = nextLevel;
@@ -1432,13 +1439,14 @@ function gameOver() {
                 b.style.backgroundColor = "black";
             });
         });
-    }, 2500)
+    }, 0) //changed to 0 from 2500 for instant game over screen and music, can be adjusted back if needed
 }
 
 // ------------------
-// SAVE (UNCHANGED)
+// SAVE current seconds adds, save seconds to get final seconds for score saving, also used in logout to save progress before exiting
 // ------------------
 function saveGame() {
+    finalSec = currSec + secondsS;
     fetch('save.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1447,11 +1455,66 @@ function saveGame() {
             health: player.maxHealth,
             candies: candies,
             level: player.level,
-            stats: { jumpHeight: player.jumpHeight, speed: player.speed }
+            jumpHeight: player.jumpHeight,
+            speed: player.speed,
+            seconds: finalSec
         })
     });
 }
 
-if (gameState !== 'GAMEOVER') {
-    requestAnimationFrame(gameLoop);
-} 
+function logoutAndSave() {
+    finalSec = currSec + secondsS;
+    fetch('save.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            playerId: "student_dev_1",
+            health: player.health,
+            candies: candies,
+            level: player.level,
+            jumpHeight: player.jumpHeight,
+            speed: player.speed,
+            seconds: finalSec
+        })
+    })
+    .then(res => res.json())
+    .then(data => window.location.href = "logout.php");
+}
+
+window.startGame = () => requestAnimationFrame(gameLoop); // runs the game loop, called in body onload
+
+// ------------------
+// RESET
+// ------------------
+// ALL OF THIS WAS CHANGED TO ADD A CONFIRMATION PROMPT BEFORE RESETTING PROGRESS, CAN BE REVERTED IF NOT DESIRED
+function reset() {
+    let ans = confirm("Are you sure you want to reset your progress?");
+    if (ans) {
+        window.location.href = "reset.php";
+    }
+}
+
+// ------------------
+// HOME
+// ------------------
+function home() {
+    window.location.href = "home.php";
+}
+
+// ------------------
+// LEADERBOARD
+// ------------------
+function leaderboard() {
+    window.location.href = "leaderboard.php";
+}
+
+
+// ------------------
+// CHEAT CODES
+// ------------------
+/*
+Complete Level: Hold C & P
+Enable High Jump: Hold J & P
+Instant Death Button: Hold I & P
+Max Health: Hold F & P
+*/
