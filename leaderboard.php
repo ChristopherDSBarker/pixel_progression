@@ -28,15 +28,13 @@ $results = $db->query("
 ");
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Leaderboard</title>
-    <link rel="icon" type="image/png" href="conceptlogo.png">
-    <link rel="stylesheet" href="style_home.css?v=1">
-    <style>
-        body {
+<html>
+	<head>
+		<title>My Best Time</title>
+        <link rel="icon" type="image/png" href="conceptlogo.png">
+        <link rel="stylesheet" href="style_home.css">
+        <style>
+            body {
             background-color: teal;
             font-family: monospace;
         }
@@ -45,19 +43,20 @@ $results = $db->query("
             width: min(760px, 90vw);
             margin: 30px auto;
             background-color: aquamarine;
-            border: 5px double black;
-            padding: 20px;
+            border: 5px ridge black;
+            box-shadow: 3px 3px 3px black;
+            padding: 10px;
         }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: rgb(255, 255, 135);
+            border: 2px solid black;
+            padding: 5px;
+            background-color: salmon;
         }
 
         th,
         td {
-            border: 2px dashed black;
+            border: 2px solid black;
             padding: 10px;
             text-align: left;
             font-size: 18px;
@@ -75,77 +74,109 @@ $results = $db->query("
             display: inline-block;
             width: 260px;
         }
-    </style>
-</head>
-<body>
+        h2 {
+            position: relative;
+            text-align: center;
 
-    <audio id="sfx_hover" src="assets/sfx_btn_hover.mp3" preload="auto"></audio>
-    
-    <div style="background-color: aquamarine; border: 5px black double; padding: 5px">
-        <h1 id="title1">P i x e l</h1>
-        <h1 id="title2"> P r o g r e s s i o n </h1>
-    </div>
+            font-family: monospace;
+            font-size: 35;
 
-    <main class="board">
-        <h1>Top 5 Best Times</h1>
+            color: rgb(255, 255, 135);
+            text-shadow: 2px 2px 2px black;
+        }
+        </style>
+	</head>
 
-        <table>
-            <tr>
-                <th>Rank</th>
-                <th>User</th>
-                <th>Best Time</th>
-                <th>Completed</th>
-            </tr>
+	<body style="background-color: teal; border: 10px double black; padding: 15px">
 
-            <?php
-            $rank = 1;
-            $hasRows = false;
+        <audio id="sfx_hover" src="assets/sfx_btn_hover.mp3" preload="auto"></audio>
 
-            while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
-                $hasRows = true;
-                ?>
-                <tr>
-                    <td><?php echo $rank; ?></td>
-                    <td><?php echo htmlspecialchars($row['username']); ?></td>
-                    <td><?php echo htmlspecialchars($row['time_formatted']); ?></td>
-                    <td><?php echo htmlspecialchars(date('M j, Y g:i A', strtotime($row['completed_at']))); ?></td>
+        <h1>
+            <u style="color: rgb(255, 255, 135); text-shadow: 2px 2px 2px black">
+                <span style="color: rgb(255, 255, 135); border-bottom: none; text-shadow: 2px 2px 2px black">P i x e l</span><br>
+            </u>
+            <u style="color: skyblue; text-shadow: 2px 2px 2px black">
+                <span style="color: skyblue; border-bottom: none; text-shadow: 2px 2px 2px black">P r o g r e s s i o n</span>
+            </u>
+        </h1>
+
+        <main class="board">
+            <h2>
+                <u style="color: rgb(255, 255, 135); text-shadow: 2px 2px 2px black">
+                    Top 5 Best Times  
+                </u>
+            </h2>
+
+            <table>
+                <tr style="background-color: antiquewhite">
+                    <th><u>Rank</u></th>
+                    <th><u>User</u></th>
+                    <th><u>Best Time</u></th>
+                    <th><u>Completed</u></th>
                 </tr>
+
                 <?php
-                $rank++;
-            }
+                $rank = 1;
+                $hasRows = false;
 
-            if (!$hasRows) { ?>
-                <tr>
-                    <td colspan="4">No boss clears recorded yet.</td>
-                </tr>
-            <?php } ?>
-        </table>
+                while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+                    $hasRows = true;
+                    ?>
+                    <tr style="background-color: rgb(255, 255, 135)">
+                        <td><?php echo $rank; ?></td>
+                        <td><?php echo htmlspecialchars($row['username']); ?></td>
+                        <td style="color: skyblue"><?php echo htmlspecialchars($row['time_formatted']); ?></td>
+                        <td><u style="color: mediumseagreen"> <?php echo htmlspecialchars(date('M j, Y g:i A', strtotime($row['completed_at']))); ?></u></td>
+                    </tr>
+                    <?php
+                    $rank++;
+                }
+
+                if (!$hasRows) { ?>
+                    <tr>
+                        <td colspan="4">No boss clears recorded yet.</td>
+                    </tr>
+                <?php } ?>
+            </table>
+
+        </main>
 
         <div class="actions">
-            <a href="home.php" class="button">HOME</a>
+            <a href="home.php" class="button" style="border: 3px solid black">HOME</a>
             <?php if (isset($_SESSION['username'])) { ?>
-                <a href="my_score.php" class="button">MY BEST TIME</a>
-                <a href="index.php" class="button">PLAY</a>
+                <a href="my_score.php" class="button" style="border: 3px solid black">MY BEST TIME</a>
             <?php } else { ?>
-                <a href="login.php" class="button">LOG IN</a>
+                <a href="login.php" class="button" style="border: 3px solid black">LOG IN</a>
             <?php } ?>
         </div>
     </main>
 
         <script>
-            let buttons = document.querySelectorAll(".button");
-            let sfxHover = document.getElementById("sfx_hover");
+            let homeButton = document.getElementsByClassName("button")[0];
+            let secondButton = document.getElementsByClassName("button")[1];
 
-            buttons.forEach(b => {
-                b.addEventListener("mouseover", function() {
-                    b.style.backgroundColor = "rgb(255, 255, 135)";
-                    sfxHover.currentTime = 0;
-                    sfxHover.play();
-                });
-                b.addEventListener("mouseout", function() {
-                    b.style.backgroundColor = "aquamarine";
-                });
+            let sfxHover = document.getElementById("sfx_hover");
+            let sfxClick = document.getElementById("sfx_click");
+            
+            homeButton.addEventListener("mouseover", function() {
+                homeButton.style.backgroundColor = "rgb(255, 255, 135)";
+                sfxHover.currentTime = 0;
+                sfxHover.play();
+            });
+
+            homeButton.addEventListener("mouseout", function() {
+                homeButton.style.backgroundColor = "aquamarine";
+            });
+
+            secondButton.addEventListener("mouseover", function() {
+                secondButton.style.backgroundColor = "rgb(255, 255, 135)";
+                sfxHover.currentTime = 0;
+                sfxHover.play();
+            });
+
+            secondButton.addEventListener("mouseout", function() {
+                secondButton.style.backgroundColor = "aquamarine";
             });
         </script>
-    </body>
+	</body>
 </html>
